@@ -20,7 +20,7 @@
 
 <!-- 商品搜索 -->
 <div class="row-fluid formSep">
-	<div class="control-group choose_list span10" data-url="{url path='goods/admin/get_goods_list'}">
+	<div class="control-group choose_list span10" data-url="{url path='groupbuy/admin/get_goods_list'}">
 		<!-- <div class="f_l"> -->
 			<select name="cat_id">
 				<option value="0">{lang key='system::system.all_category'}{$cat_list}</option>

@@ -21,8 +21,8 @@
 	<!-- <div class="row-fluid"> -->
 	<!-- <div class="choose_list span12">  -->
 	<ul class="nav nav-pills">
-		<li class="{if !$groupbuy_list.filter.type}active{/if}"><a class="data-pjax" href='{url path="groupbuy/admin/init"}'>全部 <span class="badge badge-info">{$groupbuy_list.msg_count.count}</span></a></li>
-		<li class="{if $groupbuy_list.filter.type eq 'self'}active{/if}"><a class="data-pjax" href='{url path="groupbuy/admin/init" args="type=self"}'>自营 <span class="badge badge-info">{$groupbuy_list.msg_count.self}</span></a></li>
+		<li class="{if !$groupbuy_list.filter.type}active{/if}"><a class="data-pjax" href='{url path="groupbuy/admin/init"}{if $smarty.get.keywords}&keywords={$smarty.get.keywords}{/if}'>全部 <span class="badge badge-info">{$groupbuy_list.msg_count.count}</span></a></li>
+		<li class="{if $groupbuy_list.filter.type eq 'self'}active{/if}"><a class="data-pjax" href='{url path="groupbuy/admin/init" args="type=self"}{if $smarty.get.keywords}&keywords={$smarty.get.keywords}{/if}'>自营 <span class="badge badge-info">{$groupbuy_list.msg_count.self}</span></a></li>
 	</ul>
 	<!-- </div> -->
 	<!-- </div> -->
@@ -30,7 +30,7 @@
 	
 <!-- 批量操作和搜索 -->
 <div class="row-fluid batch" >
-	<form method="post" action="{$search_action}" name="searchForm">
+	<form method="post" action="{$search_action}{if $smarty.get.type}&type={$smarty.get.type}{/if}" name="searchForm">
 		<div class="btn-group f_l m_r5">
 			<a class="btn dropdown-toggle" data-toggle="dropdown" href="#">
 				<i class="fontello-icon-cog"></i>{t}批量操作{/t}

@@ -3,7 +3,7 @@
 
 <!-- {block name="footer"} -->
 <script type="text/javascript">
-	// ecjia.merchant.groupbuy_list.init();
+	ecjia.merchant.groupbuy_list.init();
 </script>
 <!-- {/block} -->
 
@@ -24,8 +24,8 @@
         <div class="panel">
             <div class="panel-body panel-body-small">
         		<ul class="nav nav-pills pull-left">
-        			<li class="{if !$groupbuy_list.filter.type}active{/if}"><a class="data-pjax" href='{url path="groupbuy/merchant/init"}'>全部 <span class="badge badge-info">{$groupbuy_list.msg_count.count}</span> </a></li>
-        			<li class="{if $groupbuy_list.filter.type eq 'on_going'}active{/if}"><a class="data-pjax" href='{url path="groupbuy/merchant/init" args="type=on_going"}'>正在进行中 <span class="badge badge-info">{$groupbuy_list.msg_count.on_going}</span> </a></li>
+        			<li class="{if !$groupbuy_list.filter.type}active{/if}"><a class="data-pjax" href='{url path="groupbuy/merchant/init"}{if $smarty.get.keywords}&keywords={$smarty.get.keywords}{/if}'>全部 <span class="badge badge-info">{$groupbuy_list.msg_count.count}</span> </a></li>
+        			<li class="{if $groupbuy_list.filter.type eq 'on_going'}active{/if}"><a class="data-pjax" href='{url path="groupbuy/merchant/init" args="type=on_going"}{if $smarty.get.keywords}&keywords={$smarty.get.keywords}{/if}'>正在进行中 <span class="badge badge-info">{$groupbuy_list.msg_count.on_going}</span> </a></li>
         		</ul>
             </div>
             <div class="panel-body panel-body-small">
@@ -35,7 +35,7 @@
                         <li><a class="batch-trash-btn" data-toggle="ecjiabatch" data-idClass=".checkbox:checked" data-url="{url path='groupbuy/merchant/batch'}" data-msg="您确定要这么做吗？" data-noSelectMsg="请先选中要删除的团购商品！" data-name="act_id" href="javascript:;"> <i class="fa fa-trash-o"></i> 删除团购</a></li>
                    	</ul>
         		</div>
-        		<form class="form-inline pull-right" action='{$search_action}' method="post" name="searchForm">
+        		<form class="form-inline pull-right" action='{$search_action}{if $smarty.get.type}&type={$smarty.get.type}{/if}' method="post" name="searchForm">
         			<div class="form-group">
         				<input type="text" class="form-control" name="keywords" value="{$groupbuy_list.filter.keywords}" placeholder="请输入团购商品名称"/>
         			</div>
@@ -90,8 +90,8 @@
 						<!-- {/foreach} -->
 	                    </tbody>
 	                </table>
-	                <!-- {$groupbuy_list.page} -->
 	            </section>
+	            <!-- {$groupbuy_list.page} -->
 	          </div>
         </div>
     </div>

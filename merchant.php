@@ -598,7 +598,7 @@ class merchant extends ecjia_merchant {
 			$db_goods->where(RC_DB::raw('g.start_time'), '<=', $time)->where(RC_DB::raw('g.end_time'), '>=', $time);
 		}
 		$count = $db_goods->count();
-		$page = new ecjia_page($count, 10, 5);
+		$page = new ecjia_merchant_page($count, 10, 5);
 		$res = array();
 		
 		$data_content = $db_goods

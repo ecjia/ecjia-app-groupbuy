@@ -568,6 +568,26 @@ class admin extends ecjia_admin {
 	}
 	
 	/**
+	 * 搜索商品，仅返回名称及ID
+	 */
+	public function get_goods_list() {
+		$this->admin_priv('goods_update', ecjia::MSGTYPE_JSON);
+		$filter = $_GET['JSON'];
+		$arr = RC_Api::api('goods', 'get_goods_list', $filter);
+		$opt = array();
+		if (!empty($arr)) {
+			foreach ($arr AS $key => $val) {
+				$opt[] = array(
+						'value' => $val['goods_id'],
+						'text'  => $val['goods_name'],
+						'data'  => $val['shop_price']
+				);
+			}
+		}
+		return $this->showmessage('', ecjia::MSGTYPE_JSON | ecjia::MSGSTAT_SUCCESS, array('content' => $opt));
+	}
+	
+	/**
 	 * 获取团购商品列表
 	 * @access  public
 	 * @return void
