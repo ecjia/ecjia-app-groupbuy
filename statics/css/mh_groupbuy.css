@@ -1,0 +1,7 @@
+.time-picker {
+	margin-bottom: 5px;
+}
+
+.time-picker .form-control {
+	display: inline-block;
+}

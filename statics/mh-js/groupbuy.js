@@ -24,8 +24,7 @@
 				startView: 2,
 //				minView: 2,
 				forceParse: 0,
-				minuteStep: 1,
-				container: '.main_content',
+				minuteStep: 1
 			});
 			
 			$(".all").on('click', function(e){
@@ -39,7 +38,7 @@
 								dataType : "json",
 								data: {submitname : submitname},
 								success : function(data) {
-									ecjia.admin.showmessage(data);
+									ecjia.merchant.showmessage(data);
 								}
 							});
 						}
@@ -51,7 +50,7 @@
 								dataType : "json",
 								data: {submitname : submitname},
 								success : function(data) {
-									ecjia.admin.showmessage(data);
+									ecjia.merchant.showmessage(data);
 								}
 							});
 						}
@@ -63,7 +62,7 @@
 								dataType : "json",
 								data: {submitname : submitname},
 								success : function(data) {
-									ecjia.admin.showmessage(data);
+									ecjia.merchant.showmessage(data);
 								}
 							});
 						}
@@ -75,7 +74,7 @@
 								dataType : "json",
 								data: {submitname : submitname},
 								success : function(data) {
-									ecjia.admin.showmessage(data);
+									ecjia.merchant.showmessage(data);
 								}
 							});
 						}
@@ -84,20 +83,18 @@
 			});
 			
 			app.groupbuy_info.submit_form();
+			app.groupbuy_info.search_goods();
 		},
 		submit_form : function(formobj) {
 			var $form = $("form[name='theForm']");
 			var option = {
 					rules : {
 						goods_id : { required : true , min : 1},
-//						   title : { required : true },
-						start_time : {required:true,date:false},
-						end_time : {required:true,date:false},
-						
+						start_time : {required:true, date:false},
+						end_time : {required:true, date:false},
 					},
 					messages : {
-						goods_id : { min : '请在添加团购商品区域选择团购商品！' },
-//						   title : { required : "请输入文章标题！" },
+						goods_id : { required : '请选择商品' },
 						start_time : {
 							required : "",
 						},
@@ -109,14 +106,43 @@
 						$form.ajaxSubmit({
 							dataType : "json",
 							success : function(data) {
-								ecjia.admin.showmessage(data);
+								ecjia.merchant.showmessage(data);
 							}
 						});
 					}
 				}
-			var options = $.extend(ecjia.admin.defaultOptions.validate, option);
+			var options = $.extend(ecjia.merchant.defaultOptions.validate, option);
 			$form.validate(options);
-		}
+		},
+		
+		
+		search_goods : function () {
+			$('.searchGoods').on('click',function(e){
+				var keyword = $("input[name='keywords']").val();
+				var searchURL = $('.searchGoods').attr('data-url');
+				var filters = {
+						'keyword'	: keyword,
+				};
+				$.post(searchURL, filters, function(data) {
+					app.groupbuy_info.goods_list(data);
+				}, "JSON");
+			});
+		},
+		
+		goods_list : function (data) {
+			$('.goods_list').html('');
+			if (data.content.length > 0) {
+				for (var i = 0; i < data.content.length; i++) {
+					var opt = '<option value="'+data.content[i].value+'">'+data.content[i].text+'</option>'
+					$('.goods_list').append(opt);
+				};
+			} else {
+				$('.goods_list').append('<option value="-1">未搜索到商品信息</option>');
+			}
+			
+			$('.goods_list').trigger("liszt:updated").trigger("change");
+			
+		},
 	},
 	
 	/* 搜索商品 */
@@ -158,5 +184,5 @@
 			$('.selectgoods').trigger("liszt:updated").trigger("change");
 		}
 	}
-})(ecjia.admin, jQuery);
+})(ecjia.merchant, jQuery);
 // end

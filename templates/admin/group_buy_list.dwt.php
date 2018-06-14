@@ -79,7 +79,7 @@
 							<a class="ajaxremove ecjiafc-red" data-toggle="ajaxremove" data-msg="{t}您确定要删除团购商品[{$list.goods_name}]吗？{/t}" href='{RC_Uri::url("groupbuy/admin/remove","id={$list.act_id}")}' title="{t}删除{/t}">{t}删除{/t}</a> 
 							</div>
 						</td>
-						<td>{$list.merchants_name}</td>
+						<td class="ecjiafc-red">{$list.merchants_name}</td>
 						<td>{$list.deposit}</td>
 						<td>{$list.restrict_amount}</td>
 						<td>{$list.valid_goods}</td>
