@@ -25,9 +25,6 @@
 			<select name="cat_id">
 				<option value="0">{lang key='system::system.all_category'}{$cat_list}</option>
 			</select>
-			<select name="brand_id">
-				<option value="0">{lang key='system::system.all_brand'}{html_options options=$brand_list}</option>
-			</select>
 		<!-- </div> -->
 		<input type="text" name="keyword" />
 		<a class="btn" data-toggle="searchGoods">{t}搜索商品{/t}</a>

@@ -21,9 +21,8 @@
 	<!-- <div class="row-fluid"> -->
 	<!-- <div class="choose_list span12">  -->
 	<ul class="nav nav-pills">
-		<li class="{if $groupbuy_list.filter.ruidval eq '0'}active{/if}"><a class="data-pjax" href='{url path="groupbuy/admin/init" args="ruidval=0"}'>全部 <span class="badge badge-info">{$groupbuy_list.msg_count.count}</span></a></li>
-		<li class="{if $groupbuy_list.filter.ruidval eq '1'}active{/if}"><a class="data-pjax" href='{url path="groupbuy/admin/init" args="ruidval=1"}'>自营 <span class="badge badge-info">{$groupbuy_list.msg_count.myself}</span></a></li>
-		<li class="{if $groupbuy_list.filter.ruidval eq '2'}active{/if}"><a class="data-pjax" href='{url path="groupbuy/admin/init" args="ruidval=2"}'>入驻商<span class="badge badge-info">{$groupbuy_list.msg_count.other}</span></a></li>
+		<li class="{if !$groupbuy_list.filter.type}active{/if}"><a class="data-pjax" href='{url path="groupbuy/admin/init"}'>全部 <span class="badge badge-info">{$groupbuy_list.msg_count.count}</span></a></li>
+		<li class="{if $groupbuy_list.filter.type eq 'self'}active{/if}"><a class="data-pjax" href='{url path="groupbuy/admin/init" args="type=self"}'>自营 <span class="badge badge-info">{$groupbuy_list.msg_count.self}</span></a></li>
 	</ul>
 	<!-- </div> -->
 	<!-- </div> -->
@@ -55,7 +54,8 @@
 				<thead>
 					<tr>
 						<th class="table_checkbox"><input type="checkbox" name="select_rows" data-toggle="selectall" data-children=".checkbox"/></th>
-						<th class="w350">{t}商品名称{/t}</th>
+						<th class="w300">{t}商品名称{/t}</th>
+						<th class="w100">{t}商家名称{/t}</th>
 				    	<th class="w100">{t}保证金{/t}</th>
 				    	<th class="w100">{t}限购{/t}</th>
 				    	<th class="w100">{t}订购商品{/t}</th>
@@ -73,23 +73,13 @@
 						</td>
 						<td class="hide-edit-area">
 							{$list.goods_name}<br>
-							<!--  {if $priv_ru eq 1} -->
-								{if $list.user_name}
-      								<font style="color:#F00;">
-      								来自于{$list.user_name}
-      								</font>
-      							{else}
-								<font style="color:#0e92d0;">
-									来自于{t}自营{/t}
-									</font>
-	      						{/if}
-      							<!--  {/if} -->
 							<div class="edit-list">
 							{assign var=edit_url value=RC_Uri::url('groupbuy/admin/edit',"id={$list.act_id}")}
 							<a class="data-pjax" href="{$edit_url}" title="{t}编辑{/t}">{t}编辑{/t}</a>&nbsp;|&nbsp;
 							<a class="ajaxremove ecjiafc-red" data-toggle="ajaxremove" data-msg="{t}您确定要删除团购商品[{$list.goods_name}]吗？{/t}" href='{RC_Uri::url("groupbuy/admin/remove","id={$list.act_id}")}' title="{t}删除{/t}">{t}删除{/t}</a> 
 							</div>
 						</td>
+						<td>{$list.merchants_name}</td>
 						<td>{$list.deposit}</td>
 						<td>{$list.restrict_amount}</td>
 						<td>{$list.valid_goods}</td>
