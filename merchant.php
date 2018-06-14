@@ -212,7 +212,7 @@ class merchant extends ecjia_merchant {
 		
 		$links[] = array('text' => __('返回团购活动列表'), 'href'=> RC_Uri::url('groupbuy/merchant/init'));
 		$links[] = array('text' => '继续添加团购活动', 'href'=> RC_Uri::url('groupbuy/merchant/add'));
-		ecjia_admin::admin_log($goods_name, 'add', 'group_buy');
+		ecjia_merchant::admin_log($goods_name, 'add', 'group_buy');
 		$this->showmessage('添加团购活动成功！', ecjia::MSGTYPE_JSON | ecjia::MSGSTAT_SUCCESS, array('links' => $links, 'pjaxurl' => RC_Uri::url('groupbuy/merchant/edit', array('id' => $groupbuy_id))));
 	}
 	
@@ -491,7 +491,7 @@ class merchant extends ecjia_merchant {
 				))
 			);
 			$this->db_goods_activity->where(array('store_id' => $_SESSION['store_id']))->where(array('act_id' => $group_buy_id))->update($data);
-			ecjia_admin::admin_log($goods_name, 'edit', 'group_buy');
+			ecjia_merchant::admin_log($goods_name, 'edit', 'group_buy');
 			$this->showmessage('编辑团购商品成功！', ecjia::MSGTYPE_JSON | ecjia::MSGSTAT_SUCCESS, array('pjaxurl' => RC_Uri::url('groupbuy/merchant/edit', array('id' => $group_buy_id))));
 		}
 	}
@@ -515,7 +515,7 @@ class merchant extends ecjia_merchant {
             $arr = explode(',', $group_buy_id);
             foreach ($arr as $val) {
                 $goods_name = $this->db_goods_activity->where(array('act_id' => $val))->get_field('goods_name');
-                ecjia_admin::admin_log('团购商品是'.$goods_name, 'batch_remove', 'group_buy');
+                ecjia_merchant::admin_log('团购商品是'.$goods_name, 'batch_remove', 'group_buy');
             }
 			$this->db_goods_activity->where(array('store_id' => $_SESSION['store_id']))->in(array('act_id' => $group_buy_id))->delete();
 			$this->showmessage('批量删除操作成功', ecjia::MSGTYPE_JSON | ecjia::MSGSTAT_SUCCESS, array('pjaxurl' => RC_Uri::url('groupbuy/merchant/init')));
@@ -535,7 +535,7 @@ class merchant extends ecjia_merchant {
 			$this->showmessage('该团购活动已经有订单，不能删除！', ecjia::MSGTYPE_JSON | ecjia::MSGSTAT_ERROR);
 		} else {
 			if ($this->db_goods_activity->where(array('store_id' => $_SESSION['store_id']))->where(array('act_id' => $group_buy_id))->delete()) {
-				ecjia_admin::admin_log($group_buy['act_name'], 'remove', 'group_buy');
+				ecjia_merchant::admin_log($group_buy['act_name'], 'remove', 'group_buy');
 				$this->showmessage('删除成功！', ecjia::MSGTYPE_JSON | ecjia::MSGSTAT_SUCCESS);
 			} else {
 				$this->showmessage('删除失败！', ecjia::MSGTYPE_JSON | ecjia::MSGSTAT_ERROR);
