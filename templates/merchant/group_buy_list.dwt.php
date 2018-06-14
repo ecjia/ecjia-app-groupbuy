@@ -25,7 +25,7 @@
             <div class="panel-body panel-body-small">
         		<ul class="nav nav-pills pull-left">
         			<li class="{if !$groupbuy_list.filter.type}active{/if}"><a class="data-pjax" href='{url path="groupbuy/merchant/init"}'>全部 <span class="badge badge-info">{$groupbuy_list.msg_count.count}</span> </a></li>
-        			<li class="{if $groupbuy_list.filter.type eq 'self'}active{/if}"><a class="data-pjax" href='{url path="groupbuy/merchant/init" args="type=self"}'>正在进行中 <span class="badge badge-info">{$groupbuy_list.msg_count.self}</span> </a></li>
+        			<li class="{if $groupbuy_list.filter.type eq 'on_going'}active{/if}"><a class="data-pjax" href='{url path="groupbuy/merchant/init" args="type=on_going"}'>正在进行中 <span class="badge badge-info">{$groupbuy_list.msg_count.on_going}</span> </a></li>
         		</ul>
             </div>
             <div class="panel-body panel-body-small">

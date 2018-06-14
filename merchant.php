@@ -581,19 +581,21 @@ class merchant extends ecjia_merchant {
 		if ($filter['keywords']) {
 			$db_goods->where(RC_DB::raw('g.act_name'), 'like', '%'.mysql_like_quote($filter['keywords']).'%');
 		}
+		$time = RC_Time::gmtime();
 		$db_goods->where(RC_DB::raw('g.store_id'), $_SESSION['store_id']);
 		$db_goods->where(RC_DB::raw('g.act_type'), GAT_GROUP_BUY);
 		
 		$msg_count = $db_goods->select(RC_DB::raw('count(*) as count'),
-				RC_DB::raw('SUM(IF(s.manage_mode = "self", 1, 0)) as self'))->first();
+				RC_DB::raw('SUM(IF(g.start_time <'.$time.' and g.end_time > '.$time.', 1, 0)) as on_going'))->first();
 
 		$msg_count = array(
 			'count'	=> empty($msg_count['count']) ? 0 : $msg_count['count'],
-			'self'	=> empty($msg_count['self']) ? 0 : $msg_count['self'],
+			'on_going'	=> empty($msg_count['on_going']) ? 0 : $msg_count['on_going'],
 		);
 
-		if ($filter['type'] == 'self') {
+		if ($filter['type'] == 'on_going') {
 			$db_goods->where(RC_DB::raw('s.manage_mode'), 'self');
+			$db_goods->where(RC_DB::raw('g.start_time'), '<=', $time)->where(RC_DB::raw('g.end_time'), '>=', $time);
 		}
 		$count = $db_goods->count();
 		$page = new ecjia_page($count, 10, 5);
