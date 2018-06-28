@@ -47,15 +47,18 @@
 	                <table class="table table-striped table-hover table-hide-edit">
 	                    <thead>
 	                        <tr>
-								<th class="table_checkbox"><input type="checkbox" name="select_rows" data-toggle="selectall" data-children=".checkbox"/></th>
+	                        	<th class="table_checkbox check-list w30">
+									<div class="check-item">
+										<input id="checkall" type="checkbox" name="select_rows" data-toggle="selectall" data-children=".checkbox"/>
+										<label for="checkall"></label>
+									</div>
+								</th>
 								<th class="w300">{t}商品名称{/t}</th>
-								<th class="w130">{t}商家名称{/t}</th>
+								<th class="w100">{t}限购数量{/t}</th>
+								<th class="w100">{t}订单数量{/t}</th>
 								<th class="w100">{t}保证金{/t}</th>
-								<th class="w100">{t}限购{/t}</th>
-								<th class="w100">{t}订购商品{/t}</th>
-								<th class="w100">{t}订单{/t}</th>
 								<th class="w100">{t}当前价格{/t}</th>
-								<th class="w100">{t}结束时间{/t}</th>
+								<th class="w150">{t}结束时间{/t}</th>
 								<th class="w100">{t}状态{/t}</th>
 							</tr>
 	                    </thead>
@@ -76,11 +79,9 @@
 								<a class="ajaxremove ecjiafc-red" data-toggle="ajaxremove" data-msg="{t}您确定要删除团购商品[{$list.goods_name}]吗？{/t}" href='{RC_Uri::url("groupbuy/merchant/remove","id={$list.act_id}")}' title="{t}删除{/t}">{t}删除{/t}</a> 
 								</div>
 							</td>
-							<td class="ecjiafc-red">{$list.merchants_name}</td>
-							<td>{$list.deposit}</td>
 							<td>{$list.restrict_amount}</td>
-							<td>{$list.valid_goods}</td>
-							<td>{$list.valid_order}</td>
+							<td>{if $list.valid_order}{$list.valid_order}{else}0{/if}</td>
+							<td>{$list.deposit}</td>
 							<td>{$list.cur_price}</td>
 							<td>{$list.end_time}</td>
 							<td>{$list.cur_status}</td>
