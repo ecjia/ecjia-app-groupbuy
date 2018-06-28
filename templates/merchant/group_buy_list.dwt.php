@@ -32,7 +32,7 @@
         		<div class="btn-group">
         			<button type="button" class="btn btn-primary dropdown-toggle" data-toggle="dropdown"><i class="fa fa-cogs"></i> {t}批量操作{/t} <span class="caret"></span></button>
         			<ul class="dropdown-menu">
-                        <li><a class="batch-trash-btn" data-toggle="ecjiabatch" data-idClass=".checkbox:checked" data-url="{url path='groupbuy/merchant/batch'}" data-msg="您确定要这么做吗？" data-noSelectMsg="请先选中要删除的团购商品！" data-name="act_id" href="javascript:;"> <i class="fa fa-trash-o"></i> 删除团购</a></li>
+                        <li><a class="batch-trash-btn" data-toggle="ecjiabatch" data-idClass=".checkbox:checked" data-url="{url path='groupbuy/merchant/batch'}" data-msg="您确定要这么做吗？" data-noSelectMsg="请先选中要删除的团购活动记录！" data-name="act_id" href="javascript:;"> <i class="fa fa-trash-o"></i> 删除团购</a></li>
                    	</ul>
         		</div>
         		<form class="form-inline pull-right" action='{$search_action}{if $smarty.get.type}&type={$smarty.get.type}{/if}' method="post" name="searchForm">
@@ -76,7 +76,7 @@
 								<div class="edit-list">
 								{assign var=edit_url value=RC_Uri::url('groupbuy/merchant/edit',"id={$list.act_id}")}
 								<a class="data-pjax" href="{$edit_url}" title="{t}编辑{/t}">{t}编辑{/t}</a>&nbsp;|&nbsp;
-								<a class="ajaxremove ecjiafc-red" data-toggle="ajaxremove" data-msg="{t}您确定要删除团购商品[{$list.goods_name}]吗？{/t}" href='{RC_Uri::url("groupbuy/merchant/remove","id={$list.act_id}")}' title="{t}删除{/t}">{t}删除{/t}</a> 
+								<a class="ajaxremove ecjiafc-red" data-toggle="ajaxremove" data-msg="您确定要删除这条记录吗？" href='{RC_Uri::url("groupbuy/merchant/remove","id={$list.act_id}")}' title="{t}删除{/t}">{t}删除{/t}</a> 
 								</div>
 							</td>
 							<td>{$list.restrict_amount}</td>
