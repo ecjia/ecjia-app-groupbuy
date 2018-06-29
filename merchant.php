@@ -158,7 +158,7 @@ class merchant extends ecjia_merchant {
 		$price_ladder 	 = !empty($_POST['price_ladder']) 	 ? $_POST['price_ladder'] 	 : '';
 		$restrict_amount = !empty($_POST['restrict_amount']) ? $_POST['restrict_amount'] : '';
 		$gift_integral	 = !empty($_POST['gift_integral']) 	 ? $_POST['gift_integral'] 	 : '';
-		$deposit = !empty($_POST['deposit']) ? $_POST['deposit'] : '';
+		$deposit = (!empty($_POST['deposit']) && intval($_POST['deposit']) > 0) ? intval($_POST['deposit']) : 0;
 		
 		$price_ladder = array();
 		$count = count($_POST['ladder_amount']);
@@ -168,6 +168,9 @@ class merchant extends ecjia_merchant {
 				continue;
 			}
 			$price = round(floatval($_POST['ladder_price'][$i]), 2);
+			if ($price < $deposit) {
+				$this->showmessage('阶梯价格不能小于保证金金额！', ecjia::MSGTYPE_JSON | ecjia::MSGSTAT_ERROR);
+			}
 			if ($price <= 0) {
 				continue;
 			}
@@ -397,7 +400,7 @@ class merchant extends ecjia_merchant {
 			
  			$this->dbview->view = array(
 	  			'order_goods' => array(
-	  				'type'  =>Component_Model_View::TYPE_LEFT_JOIN,
+	  				'type'  => Component_Model_View::TYPE_LEFT_JOIN,
 	  				'alias' => 'g',
 	  				'on'    => 'o.order_id = g.order_id',
   				)
@@ -441,7 +444,7 @@ class merchant extends ecjia_merchant {
 			$price_ladder 	 = !empty($_POST['price_ladder']) 	 ? $_POST['price_ladder'] 	 : '';
 			$restrict_amount = !empty($_POST['restrict_amount']) ? $_POST['restrict_amount'] : '';
 			$gift_integral	 = !empty($_POST['gift_integral']) 	 ? $_POST['gift_integral'] 	 : '';
-			$deposit         = !empty($_POST['deposit']) 		 ? $_POST['deposit']  		 : '';
+			$deposit = (!empty($_POST['deposit']) && intval($_POST['deposit']) > 0) ? intval($_POST['deposit']) : 0;
 			
 			$price_ladder = array();
 			$count = count($_POST['ladder_amount']);
@@ -451,6 +454,9 @@ class merchant extends ecjia_merchant {
 					continue;
 				}
 				$price = round(floatval($_POST['ladder_price'][$i]), 2);
+				if ($price < $deposit) {
+					$this->showmessage('阶梯价格不能小于保证金金额！', ecjia::MSGTYPE_JSON | ecjia::MSGSTAT_ERROR);
+				}
 				if ($price <= 0) {
 					continue;
 				}
@@ -572,7 +578,7 @@ class merchant extends ecjia_merchant {
 	private  function  group_buy_list() {
 		$db_goods = RC_DB::table('goods_activity as g')
 			->leftJoin('store_franchisee as s', RC_DB::raw('s.store_id'), '=', RC_DB::raw('g.store_id'));
-
+		
 		$filter = array();
 		$filter['keywords'] = empty($_GET['keywords'])  ? '' 					: trim($_GET['keywords']);
 		$filter['type'] 	= !empty($_GET['type']) 	? trim($_GET['type']) 	: '';
@@ -586,17 +592,33 @@ class merchant extends ecjia_merchant {
 		$db_goods->where(RC_DB::raw('g.act_type'), GAT_GROUP_BUY);
 		
 		$msg_count = $db_goods->select(RC_DB::raw('count(*) as count'),
-				RC_DB::raw('SUM(IF(g.start_time <'.$time.' and g.end_time > '.$time.', 1, 0)) as on_going'))->first();
+				RC_DB::raw('SUM(IF(g.is_finished = 1, 1, 0)) as on_going'),
+				RC_DB::raw('SUM(IF(g.is_finished = 2, 1, 0)) as uncheck'),
+				RC_DB::raw('SUM(IF(g.is_finished = 3, 1, 0)) as successed'),
+				RC_DB::raw('SUM(IF(g.is_finished = 4, 1, 0)) as failed')
+			)->first();
 
 		$msg_count = array(
 			'count'	=> empty($msg_count['count']) ? 0 : $msg_count['count'],
 			'on_going'	=> empty($msg_count['on_going']) ? 0 : $msg_count['on_going'],
+			'uncheck'	=> empty($msg_count['uncheck']) ? 0 : $msg_count['uncheck'],
+			'successed'	=> empty($msg_count['successed']) ? 0 : $msg_count['successed'],
+			'failed'	=> empty($msg_count['failed']) ? 0 : $msg_count['failed']
 		);
 
 		if ($filter['type'] == 'on_going') {
-			$db_goods->where(RC_DB::raw('s.manage_mode'), 'self');
-			$db_goods->where(RC_DB::raw('g.start_time'), '<=', $time)->where(RC_DB::raw('g.end_time'), '>=', $time);
+			$db_goods->where(RC_DB::raw('g.is_finished'), 1);
 		}
+		if ($filter['type'] == 'uncheck') {
+			$db_goods->where(RC_DB::raw('g.is_finished'), 2);
+		}
+		if ($filter['type'] == 'successed') {
+			$db_goods->where(RC_DB::raw('g.is_finished'), 3);
+		}
+		if ($filter['type'] == 'failed') {
+			$db_goods->where(RC_DB::raw('g.is_finished'), 4);
+		}
+		
 		$count = $db_goods->count();
 		$page = new ecjia_merchant_page($count, 10, 5);
 		$res = array();

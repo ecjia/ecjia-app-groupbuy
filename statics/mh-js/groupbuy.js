@@ -127,14 +127,22 @@
 					app.groupbuy_info.goods_list(data);
 				}, "JSON");
 			});
+			
+			$("select[name='goods_id']").change(function(e) {
+				var price = $(".goods_list option:selected").attr('data-price');
+				$('#shop_price').html(price);	
+			});
 		},
 		
 		goods_list : function (data) {
 			$('.goods_list').html('');
 			if (data.content.length > 0) {
 				for (var i = 0; i < data.content.length; i++) {
-					var opt = '<option value="'+data.content[i].value+'">'+data.content[i].text+'</option>'
+					var opt = '<option value="'+data.content[i].value+'" data-price="'+data.content[i].data+'">'+data.content[i].text+'</option>'
 					$('.goods_list').append(opt);
+					if (i == 0) {
+						$('#shop_price').html(data.content[i].data);
+					}
 				};
 			} else {
 				$('.goods_list').append('<option value="-1">未搜索到商品信息</option>');

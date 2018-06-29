@@ -25,7 +25,10 @@
             <div class="panel-body panel-body-small">
         		<ul class="nav nav-pills pull-left">
         			<li class="{if !$groupbuy_list.filter.type}active{/if}"><a class="data-pjax" href='{url path="groupbuy/merchant/init"}{if $smarty.get.keywords}&keywords={$smarty.get.keywords}{/if}'>全部 <span class="badge badge-info">{$groupbuy_list.msg_count.count}</span> </a></li>
-        			<li class="{if $groupbuy_list.filter.type eq 'on_going'}active{/if}"><a class="data-pjax" href='{url path="groupbuy/merchant/init" args="type=on_going"}{if $smarty.get.keywords}&keywords={$smarty.get.keywords}{/if}'>正在进行中 <span class="badge badge-info">{$groupbuy_list.msg_count.on_going}</span> </a></li>
+        			<li class="{if $groupbuy_list.filter.type eq 'on_going'}active{/if}"><a class="data-pjax" href='{url path="groupbuy/merchant/init" args="type=on_going"}{if $smarty.get.keywords}&keywords={$smarty.get.keywords}{/if}'>进行中 <span class="badge badge-info">{$groupbuy_list.msg_count.on_going}</span> </a></li>
+        			<li class="{if $groupbuy_list.filter.type eq 'uncheck'}active{/if}"><a class="data-pjax" href='{url path="groupbuy/merchant/init" args="type=uncheck"}{if $smarty.get.keywords}&keywords={$smarty.get.keywords}{/if}'>结束未处理 <span class="badge badge-info">{$groupbuy_list.msg_count.uncheck}</span> </a></li>
+        			<li class="{if $groupbuy_list.filter.type eq 'successed'}active{/if}"><a class="data-pjax" href='{url path="groupbuy/merchant/init" args="type=successed"}{if $smarty.get.keywords}&keywords={$smarty.get.keywords}{/if}'>成功结束 <span class="badge badge-info">{$groupbuy_list.msg_count.successed}</span> </a></li>
+        			<li class="{if $groupbuy_list.filter.type eq 'failed'}active{/if}"><a class="data-pjax" href='{url path="groupbuy/merchant/init" args="type=failed"}{if $smarty.get.keywords}&keywords={$smarty.get.keywords}{/if}'>失败结束 <span class="badge badge-info">{$groupbuy_list.msg_count.failed}</span> </a></li>
         		</ul>
             </div>
             <div class="panel-body panel-body-small">
@@ -79,9 +82,9 @@
 								<a class="ajaxremove ecjiafc-red" data-toggle="ajaxremove" data-msg="您确定要删除这条记录吗？" href='{RC_Uri::url("groupbuy/merchant/remove","id={$list.act_id}")}' title="{t}删除{/t}">{t}删除{/t}</a> 
 								</div>
 							</td>
-							<td>{$list.restrict_amount}</td>
+							<td>{if $list.restrict_amount}{$list.restrict_amount}{else}0{/if}</td>
 							<td>{if $list.valid_order}{$list.valid_order}{else}0{/if}</td>
-							<td>{$list.deposit}</td>
+							<td>{if $list.deposit}{$list.deposit}{else}0{/if}</td>
 							<td>{$list.cur_price}</td>
 							<td>{$list.end_time}</td>
 							<td>{$list.cur_status}</td>

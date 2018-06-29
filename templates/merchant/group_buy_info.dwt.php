@@ -33,7 +33,7 @@
                		</div> 
                		
 					<div class="form-group">
-						<label class="control-label col-lg-2">{t}团购商品：{/t}</label>
+						<label class="control-label col-lg-2">{t}选择活动商品：{/t}</label>
 						<div class="col-lg-6">
 							<select name="goods_id" class="col-lg-12 goods_list" >
 							  <!--  {if $action eq 'insert'} -->
@@ -43,6 +43,7 @@
 						      <!-- {/if} -->
 						    </select>   
 						</div>
+						<span class="input-must">*</span>
 					</div>
 							
 					<div class="form-group" >
@@ -66,6 +67,28 @@
 							<input class="form-control" type="text" name="gift_integral" id="gift_integral" value="{$group_buy.gift_integral|default:0}" />
 						</div>
 					</div>
+					
+					<div class="form-group">
+						<label class="control-label col-lg-2">{t}活动开始时间：{/t}</label>
+						<div class="col-lg-6">
+							<input name="start_time" class="date form-control" type="text" placeholder="{t}请选择活动开始时间{/t}" value="{$group_buy.start_time}"/>
+						</div>
+						<span class="input-must">*</span>
+					</div>
+						
+					<div class="form-group">
+						<label class="control-label col-lg-2">{t}活动结束时间：{/t}</label>
+						<div class="col-lg-6">
+							<input name="end_time" class="date form-control" type="text" placeholder="{t}请选择活动结束时间{/t}" value="{$group_buy.end_time}"/>
+						</div>
+						<span class="input-must">*</span>
+					</div>
+					
+					<div class="form-group" >
+						<label class="control-label col-lg-2">{t}市场售价：{/t}</label>
+						<div class="col-lg-6 l_h30" id="shop_price">0</div>
+					</div>
+					
 								
 					<div class="form-group">
 						<label class="control-label col-lg-2">{t}价格阶梯：{/t}</label>
@@ -88,20 +111,6 @@
 						</div>
 					</div>
 								
-					<div class="form-group">
-						<label class="control-label col-lg-2">{t}活动开始时间：{/t}</label>
-						<div class="col-lg-6">
-							<input name="start_time" class="date form-control" type="text" placeholder="{t}请选择活动开始时间{/t}" value="{$group_buy.start_time}"/>
-						</div>
-					</div>
-						
-					<div class="form-group">
-						<label class="control-label col-lg-2">{t}活动结束时间：{/t}</label>
-						<div class="col-lg-6">
-							<input name="end_time" class="date form-control" type="text" placeholder="{t}请选择活动结束时间{/t}" value="{$group_buy.end_time}"/>
-						</div>
-					</div>
-					
 					<div class="page-header panel-body m_b0">
 						<div class="pull-left">
 							<h3>团购活动介绍</h3>
@@ -121,8 +130,8 @@
 						    {if $group_buy.status eq 1}
 						    <input type="submit" name="finish" value="{lang key='groupbuy::groupbuy.button_finish'}" class="btn btn-info all" />
 						    {elseif $group_buy.status eq 2}
-						    <input type="submit" name="succeed" value="{lang key='groupbuy::groupbuy.button_succeed'}" class="btn btn-info all" />{$lang.notice_succeed}
-						    <input type="submit" name="fail" value="{lang key='groupbuy::groupbuy.button_fail'}" class="btn btn-info all" />{$lang.notice_fail}
+						    <input type="submit" name="succeed" value="{lang key='groupbuy::groupbuy.button_succeed'}" class="btn btn-info all" />活动成功
+						    <input type="submit" name="fail" value="{lang key='groupbuy::groupbuy.button_fail'}" class="btn btn-info all" />活动失败
 						    {elseif $group_buy.status eq 3}
 						    <input type="submit" name="mail" value="{lang key='groupbuy::groupbuy.button_mail'}" class="btn btn-info all"  />
 						    {/if}
