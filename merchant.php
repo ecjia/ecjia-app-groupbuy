@@ -540,12 +540,10 @@ class merchant extends ecjia_merchant {
 		if ($group_buy['valid_order'] > 0) {
 			$this->showmessage('该团购活动已经有订单，不能删除！', ecjia::MSGTYPE_JSON | ecjia::MSGSTAT_ERROR);
 		} else {
-			if ($this->db_goods_activity->where(array('store_id' => $_SESSION['store_id']))->where(array('act_id' => $group_buy_id))->delete()) {
-				ecjia_merchant::admin_log($group_buy['act_name'], 'remove', 'group_buy');
-				$this->showmessage('删除成功！', ecjia::MSGTYPE_JSON | ecjia::MSGSTAT_SUCCESS);
-			} else {
-				$this->showmessage('删除失败！', ecjia::MSGTYPE_JSON | ecjia::MSGSTAT_ERROR);
-			}
+			RC_DB::table('goods_activity')->where('store_id', $_SESSION['store_id'])->where('act_id', $group_buy_id)->delete();
+			
+			ecjia_merchant::admin_log($group_buy['act_name'], 'remove', 'group_buy');
+			$this->showmessage('删除成功！', ecjia::MSGTYPE_JSON | ecjia::MSGSTAT_SUCCESS);
 		}
 	}
 	

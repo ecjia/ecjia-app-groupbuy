@@ -55,7 +55,7 @@
 							});
 						}
 					}, {ok:'确定', cancel:'取消'});
-				} else if (submitname == 'mail'){
+				} else if (submitname == 'sms'){
 					smoke.confirm("通知客户付清余款，以便发货",function(e){
 						if (e) {
 							$form.ajaxSubmit({

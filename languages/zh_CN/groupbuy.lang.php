@@ -87,6 +87,7 @@ return array(
 		),
 
 		'button_mail' 	=> '发送邮件',
+		'button_sms' 	=> '发送短信',
 		'mail_result' 	=> '该团购活动共有 %s 个有效订单，成功发送了 %s 封邮件。',
 		'invalid_time' 	=> '您输入了一个无效的团购时间。',
 
@@ -156,6 +157,8 @@ return array(
 		'refund_error_notice'	=> '匿名用户不能返回退款到帐户余额！',
 		'error_notice'			=> '操作有误！请重新操作！',
 		'order_refund' 			=> '订单退款：%s',
+
+		'update'	=> '更新'
 );
 
 //end

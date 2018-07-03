@@ -125,15 +125,23 @@
 					</div>
 					<div class="form-group">
 						<div class="col-lg-offset-2 col-lg-10">
+							{if $group_buy.status neq 4}
 							<input name="act_id" type="hidden" id="act_id" value="{$group_buy.act_id}">
-						    <input type="submit" name="submit" value="{lang key='system::system.button_submit'}" class="btn btn-info" />
+						    <input type="submit" name="submit" value="{if $group_buy.act_id}{lang key='groupbuy::groupbuy.update'}{else}{lang key='system::system.button_submit'}{/if}" class="btn btn-info" />&nbsp;
+						   	{/if}
+
+						   	<!-- 进行中 -->
 						    {if $group_buy.status eq 1}
-						    <input type="submit" name="finish" value="{lang key='groupbuy::groupbuy.button_finish'}" class="btn btn-info all" />
+						    <input type="submit" name="finish" value="{lang key='groupbuy::groupbuy.button_finish'}" class="btn btn-info all" />&nbsp;
+						    
+						    <!-- 结束未处理 -->
 						    {elseif $group_buy.status eq 2}
-						    <input type="submit" name="succeed" value="{lang key='groupbuy::groupbuy.button_succeed'}" class="btn btn-info all" />活动成功
-						    <input type="submit" name="fail" value="{lang key='groupbuy::groupbuy.button_fail'}" class="btn btn-info all" />活动失败
+						    <input type="submit" name="succeed" value="{lang key='groupbuy::groupbuy.button_succeed'}" class="btn btn-info all" />&nbsp;
+						    <input type="submit" name="fail" value="{lang key='groupbuy::groupbuy.button_fail'}" class="btn btn-info all" />&nbsp;
+						    
+						    <!-- 成功结束 -->
 						    {elseif $group_buy.status eq 3}
-						    <input type="submit" name="mail" value="{lang key='groupbuy::groupbuy.button_mail'}" class="btn btn-info all"  />
+						    <input type="submit" name="sms" value="{lang key='groupbuy::groupbuy.button_sms'}" class="btn btn-info all"  />&nbsp;
 						    {/if}
 						</div>
 					</div>
