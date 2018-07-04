@@ -80,6 +80,7 @@ class pay_module extends api_front implements api_interface {
 		if ($order['extension_code'] == 'groupbuy' && $order['extension_id'] > 0) {
 			RC_Loader::load_app_func('admin_goods', 'goods');
 			$group_buy = group_buy_info($order['extension_id']);
+			
 			$now = RC_Time::gmtime();
 			//团购活动有没保证金
 			if ($group_buy['deposit'] > 0) {
@@ -87,7 +88,7 @@ class pay_module extends api_front implements api_interface {
 				//1.活动结束未处理
 				//2.活动失败结束
 				if ($group_buy['is_finished'] == 0) {
-					if ($now < $group_buy['start_date'] || $now < $group_buy['end_date']) {
+					if ($now < $group_buy['start_date'] || $now > $group_buy['end_date']) {
 						return new ecjia_error('groupbuy_activity_error', '抱歉，团购活动未开始或已结束！');
 					}
 				} elseif ($group_buy['is_finished'] == GBS_FAIL) {
@@ -98,7 +99,7 @@ class pay_module extends api_front implements api_interface {
 				//1.活动结束未处理
 				//2.活动失败结束
 				if ($group_buy['is_finished'] == 0) {
-					if ($now < $group_buy['start_date'] || $now < $group_buy['end_date']) {
+					if ($now < $group_buy['start_date'] || $now > $group_buy['end_date']) {
 						return new ecjia_error('groupbuy_activity_error', '抱歉，团购活动未开始或已结束！');
 					}
 				} elseif ($group_buy['is_finished'] == GBS_FAIL) {
@@ -109,6 +110,7 @@ class pay_module extends api_front implements api_interface {
 		
 		//支付方式信息
 		$payment_info = with(new Ecjia\App\Payment\PaymentPlugin)->getPluginDataById($order['pay_id']);
+	
 		// 取得支付信息，生成支付代码
 		$handler = with(new Ecjia\App\Payment\PaymentPlugin)->channel($payment_info['pay_code']);
 		$handler->set_orderinfo($order);
