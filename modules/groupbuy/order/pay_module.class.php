@@ -55,12 +55,14 @@ class pay_module extends api_front implements api_interface {
     public function handleRequest(\Royalcms\Component\HttpKernel\Request $request) {	
     	
     	$user_id = $_SESSION['user_id'];
+    	
     	if ($user_id < 1 ) {
     	    return new ecjia_error(100, 'Invalid session');
     	}
     	
 		$order_id	= $this->requestData('order_id', 0);
 		$is_mobile	= $this->requestData('is_mobile', true);
+		$wxpay_open_id = $this->requestData('wxpay_open_id', null);
 		
 		if (!$order_id) {
 			return new ecjia_error('invalid_parameter', RC_Lang::get('orders::order.invalid_parameter'));
@@ -68,11 +70,10 @@ class pay_module extends api_front implements api_interface {
 		
 		/* 订单详情 */
 		$order = RC_Api::api('orders', 'order_info', array('order_id' => $order_id));
-		
 		if (is_ecjia_error($order)) {
 			return $order;
 		}
-			
+		
 		if ($_SESSION['user_id'] != $order['user_id']) {
 			return new ecjia_error('error_order_detail', RC_Lang::get('orders::order.error_order_detail'));
 		}
@@ -80,7 +81,7 @@ class pay_module extends api_front implements api_interface {
 		if ($order['extension_code'] == 'groupbuy' && $order['extension_id'] > 0) {
 			RC_Loader::load_app_func('admin_goods', 'goods');
 			$group_buy = group_buy_info($order['extension_id']);
-			
+				
 			$now = RC_Time::gmtime();
 			//团购活动有没保证金
 			if ($group_buy['deposit'] > 0) {
@@ -108,13 +109,32 @@ class pay_module extends api_front implements api_interface {
 			}
 		}
 		
+		//添加微信支付需要的OPEN_ID
+		if ($wxpay_open_id) {
+		    $order['open_id'] = $wxpay_open_id;
+		}
+		
 		//支付方式信息
-		$payment_info = with(new Ecjia\App\Payment\PaymentPlugin)->getPluginDataById($order['pay_id']);
-	
-		// 取得支付信息，生成支付代码
-		$handler = with(new Ecjia\App\Payment\PaymentPlugin)->channel($payment_info['pay_code']);
+		RC_Logger::getLogger('info')->info('order-pay');
+		RC_Logger::getLogger('info')->info($order);
+		
+		$handler = with(new Ecjia\App\Payment\PaymentPlugin)->channel(intval($order['pay_id']));
+		if (is_ecjia_error($handler)) {
+		    return $handler;
+		}
+		
+		/* 插入支付流水记录*/
+		RC_Api::api('payment', 'save_payment_record', [
+    		'order_sn' 		 => $order['order_sn'],
+    		'total_fee'      => $order['order_amount'],
+    		'pay_code'       => $handler->getCode(),
+    		'pay_name'		 => $handler->getName(),
+    		'trade_type'	 => 'buy',
+		]);
+		
 		$handler->set_orderinfo($order);
 		$handler->set_mobile($is_mobile);
+		$handler->setPaymentRecord(new Ecjia\App\Payment\Repositories\PaymentRecordRepository());
 		
 		$result = $handler->get_code(Ecjia\App\Payment\PayConstant::PAYCODE_PARAM);
         if (is_ecjia_error($result)) {
@@ -122,29 +142,39 @@ class pay_module extends api_front implements api_interface {
         } else {
             $order['payment'] = $result;
         }
-        
-        /* 插入支付流水记录*/
-        $db = RC_DB::table('payment_record');
-        $payment_record = $db->where('order_sn', $order['order_sn'])->first();
-        $payment_data = array(
-        	'order_sn'		=> $order['order_sn'],
-        	'trade_type'	=> 'buy',
-        	'pay_code'		=> $payment_info['pay_code'],
-        	'pay_name'		=> $payment_info['pay_name'],
-        	'total_fee'		=> $order['order_amount'],
-        	'pay_status'	=> 0,
-        );
-        if (empty($payment_record)) {
-        	$payment_data['create_time']	= RC_Time::gmtime();
-        	$db->insertGetId($payment_data);
-        } elseif($payment_record['pay_status'] == 0 && $payment_record['pay_code'] != $payment_info['pay_code'] && $order['order_amount'] != $payment_record['total_fee']) {
-        	$payment_data['update_time']	= RC_Time::gmtime();
-        	$db->where('order_sn', $order['order_sn'])->update($payment_data);
-        }
+
         //增加支付状态
         $order['payment']['order_pay_status'] = $order['pay_status'];//0 未付款，1付款中，2已付款
         
-        return array('payment' => $order['payment']);
+        $cod_fee = 0;
+        if (intval($order['shipping_id']) > 0) {
+            $shipping = RC_Api::api('shipping', 'shipping_area_info', array(
+            	'shipping_id' => $order['shipping_id'],
+            	'store_id'     => $order['store_id'],
+            	'country'      => $order['country'],
+            	'province'     => $order['province'],
+            	'city'         => $order['city'],
+            	'district'     => $order['district'],
+            ));
+            
+            if (! is_ecjia_error($shipping)) {
+                if (array_get($shipping, 'shipping.support_cod')) {
+                    $cod_fee = array_get($shipping, 'area.pay_fee');
+                }
+            }
+        }
+        
+        $payment_list = RC_Api::api('payment', 'available_payments', array('store_id' => $order['store_id'], 'cod_fee' => $cod_fee));
+
+        $other = collect($payment_list)->mapWithKeys(function ($item) use ($order) {
+            if ($item['pay_id'] == $order['pay_id']) {
+                return array();
+            }
+            
+            return array($item);
+        })->all();
+
+        return array('payment' => $order['payment'], 'others' => $other);
 	}
 }
 
