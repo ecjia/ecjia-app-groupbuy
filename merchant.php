@@ -707,6 +707,7 @@ class merchant extends ecjia_merchant {
 		// $stat = $dbview->find ( "o.extension_code = 'group_buy' AND o.extension_id = '$group_buy_id' AND g.goods_id = '$group_buy_goods_id' 
 		// AND (order_status = '" . OS_CONFIRMED . "' OR order_status = '" . OS_UNCONFIRMED . "')" );
 		$stat = RC_DB::table('order_info as o')->leftJoin('order_goods as g', RC_DB::raw('o.order_id'), '=', RC_DB::raw('g.order_id'))
+				->select(RC_DB::raw('COUNT(*) AS total_order'), RC_DB::raw('SUM(g.goods_number) AS total_goods'))
 				->where(RC_DB::raw('o.extension_code'), 'group_buy')
 				->where(RC_DB::raw('o.extension_id'), $group_buy_id)
 				->where(RC_DB::raw('g.goods_id'), $group_buy_goods_id)
