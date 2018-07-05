@@ -78,7 +78,7 @@ class pay_module extends api_front implements api_interface {
 			return new ecjia_error('error_order_detail', RC_Lang::get('orders::order.error_order_detail'));
 		}
 		
-		if ($order['extension_code'] == 'groupbuy' && $order['extension_id'] > 0) {
+		if ($order['extension_code'] == 'group_buy' && $order['extension_id'] > 0) {
 			RC_Loader::load_app_func('admin_goods', 'goods');
 			$group_buy = group_buy_info($order['extension_id']);
 				

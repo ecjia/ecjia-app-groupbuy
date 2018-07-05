@@ -157,7 +157,7 @@ class detail_module extends api_front implements api_interface {
 		} elseif ($order['extension_code'] == 'storepickup') {
 			$order['order_mode'] = 'storepickup';
 			$order['label_order_mode'] = '自提';
-		} elseif ($order['extension_code'] == 'groupbuy') {
+		} elseif ($order['extension_code'] == 'group_buy') {
 			$order['order_mode'] = 'groupbuy';
 			$order['label_order_mode'] = '团购';
 		} else {
@@ -301,7 +301,7 @@ class detail_module extends api_front implements api_interface {
 		$has_deposit = 0;
 		$order_deposit = 0;
 		/*团购订单保证金处理*/
-		if ($order['extension_code'] == 'groupbuy' && $order['extension_id'] > 0) {
+		if ($order['extension_code'] == 'group_buy' && $order['extension_id'] > 0) {
 			RC_Loader::load_app_func('admin_goods', 'goods');
 			$group_buy = group_buy_info($order['extension_id']);
 			if ($group_buy['deposit'] > 0) {

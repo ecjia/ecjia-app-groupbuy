@@ -92,7 +92,7 @@ class groupbuy_activity {
 			$has_buyed = RC_DB::table('order_info as oi')
 			->leftJoin('order_goods as og', RC_DB::raw('og.order_id'), '=', RC_DB::raw('oi.order_id'))
 			->where(RC_DB::raw('oi.extension_id'), $group_buy_id)
-			->where(RC_DB::raw('oi.extension_code'), 'groupbuy')
+			->where(RC_DB::raw('oi.extension_code'), 'group_buy')
 			->where(RC_DB::raw('oi.order_status'), '<>', OS_INVALID)
 			->select(RC_DB::raw('SUM(goods_number) as total_buyed'))->first();
 	

@@ -70,7 +70,7 @@ class list_module extends api_front implements api_interface {
 		
 		//$type = $type == 'whole' ? '' : $type;
 		$type = empty($type) ? '' : $type;
-		$options = array('type' => $type, 'store_id' => $store_id, 'page' => $page, 'size' => $size, 'keywords'=> $keywords, 'extension_code' => 'groupbuy');
+		$options = array('type' => $type, 'store_id' => $store_id, 'page' => $page, 'size' => $size, 'keywords'=> $keywords, 'extension_code' => 'group_buy');
 		$result = RC_Api::api('orders', 'order_list', $options);
 		
 		if (is_ecjia_error($result)) {
@@ -86,7 +86,7 @@ class list_module extends api_front implements api_interface {
 				unset($val['seller_id']);
 				unset($val['seller_name']);
 			
-				if ($val['extension_code'] == 'groupbuy' && $val['extension_id'] > 0) {
+				if ($val['extension_code'] == 'group_buy' && $val['extension_id'] > 0) {
 					$group_buy = group_buy_info($val['extension_id']);
 					if ($group_buy['deposit'] > 0) {
 						if ($group_buy['is_finished'] == GBS_SUCCEED) {
