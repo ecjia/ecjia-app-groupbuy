@@ -112,7 +112,7 @@
 					</div>
 					
 					<div class="form-group">
-						<label class="control-label col-lg-2">团购活动介绍：</label>
+						<label class="control-label col-lg-2">活动说明：</label>
 						<div class="col-lg-6">
 							<textarea class="form-control" name="act_desc">{$group_buy.act_desc}</textarea>
 						</div>
@@ -131,11 +131,11 @@
 						    
 						    <!-- 结束未处理 -->
 						    {elseif $group_buy.status eq 2}
-						    <input type="submit" name="succeed" value="{lang key='groupbuy::groupbuy.button_succeed'}" class="btn btn-info all" />&nbsp;
-						    <input type="submit" name="fail" value="{lang key='groupbuy::groupbuy.button_fail'}" class="btn btn-info all" />&nbsp;
+						    <input type="submit" name="succeed" value="{lang key='groupbuy::groupbuy.button_succeed'}" class="btn btn-info all" />{lang key='groupbuy::groupbuy.notice_succeed'}
+						    <input type="submit" name="fail" value="{lang key='groupbuy::groupbuy.button_fail'}" class="btn btn-info all" />{lang key='groupbuy::groupbuy.notice_fail'}
 						    
 						    <!-- 成功结束 -->
-						    {elseif $group_buy.status eq 3}
+						    {elseif $group_buy.status eq 3 && $group_buy.deposit neq 0}
 						    <input type="submit" name="sms" value="{lang key='groupbuy::groupbuy.button_sms'}" class="btn btn-info all"  />&nbsp;
 						    {/if}
 						</div>
