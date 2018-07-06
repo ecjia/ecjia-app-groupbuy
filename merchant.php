@@ -225,8 +225,8 @@ class merchant extends ecjia_merchant {
 	public function edit() {
 		$this->admin_priv('groupbuy_update', ecjia::MSGTYPE_JSON);
 
-		$this->assign('ur_here', '更新团购商品');
-		$this->assign('ur_here2', '更新团购信息');
+		$this->assign('ur_here', '编辑团购商品');
+		$this->assign('ur_here2', '编辑团购信息');
 		$this->assign('action_link', array('href' => RC_Uri::url('groupbuy/merchant/init'), 'text' => '团购活动列表'));
 		ecjia_screen::get_current_screen()->add_nav_here(new admin_nav_here(__('更新团购活动')));
 		ecjia_screen::get_current_screen()->add_help_tab(array(
@@ -243,7 +243,7 @@ class merchant extends ecjia_merchant {
 		
 		$act_id = intval($_GET['id']) ;
 		$group_buy = $this->group_buy_info($act_id);
-		
+
 		$this->assign('group_buy', $group_buy);
 		$this->assign('form_action', RC_Uri::url('groupbuy/merchant/update'));
 		$this->assign_lang();
@@ -274,8 +274,7 @@ class merchant extends ecjia_merchant {
 			);
 		    $this->db_goods_activity->where(array('store_id' => $_SESSION['store_id']))->where(array('act_id' => $group_buy_id))->update($data);
 
-			$links[] = array('text' => RC_Lang::get('groupbuy::groupbuy.back_list'),'href' => RC_Uri::url('groupbuy/merchant/init'));
-			$this->showmessage(RC_Lang::get('groupbuy::groupbuy.edit_success'), ecjia::MSGTYPE_JSON|ecjia::MSGSTAT_SUCCESS, array('links' => $links, 'pjaxurl' => RC_Uri::url('groupbuy/merchant/edit', array('id' => $group_buy_id))));
+			$this->showmessage(RC_Lang::get('groupbuy::groupbuy.edit_success'), ecjia::MSGTYPE_JSON | ecjia::MSGSTAT_SUCCESS, array('refresh_url' => RC_Uri::url('groupbuy/merchant/edit', array('id' => $group_buy_id))));
 		} elseif ($submitname == 'succeed') {
 			if ($group_buy['status'] != GBS_FINISHED) {
 				$this->showmessage(RC_Lang::get('groupbuy::groupbuy.error_status'), ecjia::MSGTYPE_JSON | ecjia::MSGSTAT_ERROR);

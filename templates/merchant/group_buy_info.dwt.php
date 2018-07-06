@@ -110,19 +110,14 @@
 						  	<!-- {/foreach} -->
 						</div>
 					</div>
+					
+					<div class="form-group">
+						<label class="control-label col-lg-2">团购活动介绍：</label>
+						<div class="col-lg-6">
+							<textarea class="form-control" name="act_desc">{$group_buy.act_desc}</textarea>
+						</div>
+					</div>
 								
-					<div class="page-header panel-body m_b0">
-						<div class="pull-left">
-							<h3>团购活动介绍</h3>
-						</div>
-						<div class="clearfix">
-						</div>
-					</div>
-					<div class="row-fluid panel-body">
-						<div class="span12">
-							{ecjia:editor content=$group_buy.act_desc textarea_name='act_desc'}
-						</div>
-					</div>
 					<div class="form-group">
 						<div class="col-lg-offset-2 col-lg-10">
 							{if $group_buy.status neq 4}
