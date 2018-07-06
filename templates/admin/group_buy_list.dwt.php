@@ -11,38 +11,28 @@
 <div>
 	<h3 class="heading">
 		<!-- {if $ur_here}{$ur_here}{/if} -->
-		{if $action_link}
-		<a class="btn plus_or_reply data-pjax" href="{$action_link.href}" id="sticky_a"><i class="fontello-icon-plus"></i>{$action_link.text}</a>
-		{/if}
 	</h3>
 </div>
 
-<!--  {if $priv_ru eq 1} -->
-	<!-- <div class="row-fluid"> -->
-	<!-- <div class="choose_list span12">  -->
+<!-- <div class="row-fluid"> -->
+<!-- <div class="choose_list span12">  -->
 	<ul class="nav nav-pills">
-		<li class="{if !$groupbuy_list.filter.type}active{/if}"><a class="data-pjax" href='{url path="groupbuy/admin/init"}{if $smarty.get.keywords}&keywords={$smarty.get.keywords}{/if}'>全部 <span class="badge badge-info">{$groupbuy_list.msg_count.count}</span></a></li>
-		<li class="{if $groupbuy_list.filter.type eq 'self'}active{/if}"><a class="data-pjax" href='{url path="groupbuy/admin/init" args="type=self"}{if $smarty.get.keywords}&keywords={$smarty.get.keywords}{/if}'>自营 <span class="badge badge-info">{$groupbuy_list.msg_count.self}</span></a></li>
+		<li class="{if !$groupbuy_list.filter.type}active{/if}"><a class="data-pjax" href='{url path="groupbuy/admin/init"}{if $smarty.get.keywords}&keywords={$smarty.get.keywords}{/if}'>全部 <span class="badge badge-info">{$groupbuy_list.msg_count.count}</span> </a></li>
+        <li class="{if $groupbuy_list.filter.type eq 'on_going'}active{/if}"><a class="data-pjax" href='{url path="groupbuy/admin/init" args="type=on_going"}{if $smarty.get.keywords}&keywords={$smarty.get.keywords}{/if}'>进行中 <span class="badge badge-info">{$groupbuy_list.msg_count.on_going}</span> </a></li>
+     	<li class="{if $groupbuy_list.filter.type eq 'uncheck'}active{/if}"><a class="data-pjax" href='{url path="groupbuy/admin/init" args="type=uncheck"}{if $smarty.get.keywords}&keywords={$smarty.get.keywords}{/if}'>结束未处理 <span class="badge badge-info">{$groupbuy_list.msg_count.uncheck}</span> </a></li>
+      	<li class="{if $groupbuy_list.filter.type eq 'successed'}active{/if}"><a class="data-pjax" href='{url path="groupbuy/admin/init" args="type=successed"}{if $smarty.get.keywords}&keywords={$smarty.get.keywords}{/if}'>成功结束 <span class="badge badge-info">{$groupbuy_list.msg_count.successed}</span> </a></li>
+      	<li class="{if $groupbuy_list.filter.type eq 'failed'}active{/if}"><a class="data-pjax" href='{url path="groupbuy/admin/init" args="type=failed"}{if $smarty.get.keywords}&keywords={$smarty.get.keywords}{/if}'>失败结束 <span class="badge badge-info">{$groupbuy_list.msg_count.failed}</span> </a></li>
 	</ul>
 	<!-- </div> -->
-	<!-- </div> -->
-<!--  {/if} -->
+<!-- </div> -->
 	
 <!-- 批量操作和搜索 -->
 <div class="row-fluid batch" >
+	
 	<form method="post" action="{$search_action}{if $smarty.get.type}&type={$smarty.get.type}{/if}" name="searchForm">
-		<div class="btn-group f_l m_r5">
-			<a class="btn dropdown-toggle" data-toggle="dropdown" href="#">
-				<i class="fontello-icon-cog"></i>{t}批量操作{/t}
-				<span class="caret"></span>
-			</a>
-			<ul class="dropdown-menu">
-				<li><a class="button_remove" data-toggle="ecjiabatch" data-idClass=".checkbox:checked" data-url="{url path='groupbuy/admin/batch'}" data-msg="您确定要这么做吗？" data-noSelectMsg="请先选中要删除的团购商品！" data-name="act_id" href="javascript:;"><i class="fontello-icon-trash"></i>{t}删除团购{/t}</a></li>
-			</ul>
-		</div>
 		<div class="choose_list f_r" >
 			<input type="text" name="keywords" value="{$groupbuy_list.filter.keywords}" placeholder="请输入团购商品名称"/>
-			<button class="btn search_groupgoods" type="button">{t}搜索{/t}</button>
+			<button class="btn search-btn" type="button">{t}搜索{/t}</button>
 		</div>
 	</form>
 </div>
@@ -52,17 +42,16 @@
 		<form method="POST" action="{$form_action}" name="listForm">
 			<table class="table table-striped smpl_tbl dataTable table-hide-edit">
 				<thead>
-					<tr>
+					<tr data-sorthref='{RC_Uri::url("groupbuy/admin/init", "{if $smarty.get.type}&type={$smarty.get.type}{/if}")}'>
 						<th class="table_checkbox"><input type="checkbox" name="select_rows" data-toggle="selectall" data-children=".checkbox"/></th>
-						<th class="w300">{t}商品名称{/t}</th>
+						<th class="w200">{t}商品名称{/t}</th>
 						<th class="w100">{t}商家名称{/t}</th>
-				    	<th class="w100">{t}保证金{/t}</th>
-				    	<th class="w100">{t}限购{/t}</th>
-				    	<th class="w100">{t}订购商品{/t}</th>
-				    	<th class="w100">{t}订单{/t}</th>
-				    	<th class="w100">{t}当前价格{/t}</th>
-				    	<th class="w100">{t}结束时间{/t}</th>
-				    	<th class="w100">{t}状态{/t}</th>
+						<th class="w70">{t}限购数量{/t}</th>
+						<th class="w70">{t}订单数量{/t}</th>
+				    	<th class="w70">{t}保证金{/t}</th>
+				    	<th class="w70">{t}当前价格{/t}</th>
+				    	<th class="w100" data-toggle="sortby" data-sortby="end_time">{t}结束时间{/t}</th>
+				    	<th class="w80">{t}状态{/t}</th>
 	                </tr>
 				</thead>
 				<tbody>
@@ -74,16 +63,15 @@
 						<td class="hide-edit-area">
 							{$list.goods_name}<br>
 							<div class="edit-list">
-							{assign var=edit_url value=RC_Uri::url('groupbuy/admin/edit',"id={$list.act_id}")}
-							<a class="data-pjax" href="{$edit_url}" title="{t}编辑{/t}">{t}编辑{/t}</a>&nbsp;|&nbsp;
-							<a class="ajaxremove ecjiafc-red" data-toggle="ajaxremove" data-msg="{t}您确定要删除团购商品[{$list.goods_name}]吗？{/t}" href='{RC_Uri::url("groupbuy/admin/remove","id={$list.act_id}")}' title="{t}删除{/t}">{t}删除{/t}</a> 
+							{assign var=edit_url value=RC_Uri::url('groupbuy/admin/view',"id={$list.act_id}")}
+							<a class="data-pjax" href="{$edit_url}" title="{t}查看{/t}">{t}活动详情{/t}</a>&nbsp;|&nbsp;
+							<a class="data-pjax" href='{RC_Uri::url("groupbuy/admin/view_order","group_buy_id={$list.act_id}")}' title="{t}查看订单{/t}">{t}查看订单{/t}</a> 
 							</div>
 						</td>
 						<td class="ecjiafc-red">{$list.merchants_name}</td>
-						<td>{$list.deposit}</td>
 						<td>{$list.restrict_amount}</td>
-						<td>{$list.valid_goods}</td>
 						<td>{$list.valid_order}</td>
+						<td>{$list.deposit}</td>
 						<td>{$list.cur_price}</td>
 						<td>{$list.end_time}</td>
 						<td>{$list.cur_status}</td>

@@ -246,7 +246,6 @@ class merchant extends ecjia_merchant {
 
 		$this->assign('group_buy', $group_buy);
 		$this->assign('form_action', RC_Uri::url('groupbuy/merchant/update'));
-		$this->assign_lang();
 		
 		$shop_price = RC_DB::table('goods')->where('store_id', $_SESSION['store_id'])->where('goods_id', $group_buy['goods_id'])->pluck('shop_price');
 		$this->assign('shop_price', $shop_price);
@@ -599,11 +598,11 @@ class merchant extends ecjia_merchant {
 			)->first();
 
 		$msg_count = array(
-			'count'	=> empty($msg_count['count']) ? 0 : $msg_count['count'],
-			'on_going'	=> empty($msg_count['on_going']) ? 0 : $msg_count['on_going'],
-			'uncheck'	=> empty($msg_count['uncheck']) ? 0 : $msg_count['uncheck'],
-			'successed'	=> empty($msg_count['successed']) ? 0 : $msg_count['successed'],
-			'failed'	=> empty($msg_count['failed']) ? 0 : $msg_count['failed']
+			'count'	=> empty($msg_count['count']) 			? 0 : $msg_count['count'],
+			'on_going'	=> empty($msg_count['on_going']) 	? 0 : $msg_count['on_going'],
+			'uncheck'	=> empty($msg_count['uncheck']) 	? 0 : $msg_count['uncheck'],
+			'successed'	=> empty($msg_count['successed']) 	? 0 : $msg_count['successed'],
+			'failed'	=> empty($msg_count['failed']) 		? 0 : $msg_count['failed']
 		);
 
 		if ($filter['type'] == 'on_going') {

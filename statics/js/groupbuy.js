@@ -3,9 +3,22 @@
 	app.groupbuy_list = {
 		init : function() {
 			//搜索功能
-			$("form[name='searchForm'] .search_groupgoods").on('click', function(e){
+			$(".search-btn").off('click').on('click', function(e){
 				e.preventDefault();
-				var url = $("form[name='searchForm']").attr('action') + '&keywords=' +$("input[name='keywords']").val();
+				var keywords = $("input[name='keywords']").val();
+				var order_sn = $("input[name='order_sn']").val();
+				var user_name = $("input[name='user_name']").val();
+
+				var url = $("form[name='searchForm']").attr('action');
+				if (keywords != '' && keywords != undefined) {
+					url += '&keywords=' + keywords;
+				}
+				if (order_sn != '' && order_sn != undefined) {
+					url += '&order_sn=' + order_sn;
+				}
+				if (user_name != '' && user_name != undefined) {
+					url += '&user_name=' + user_name;
+				}
 				ecjia.pjax(url);
 			});
 		}
