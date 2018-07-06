@@ -248,6 +248,9 @@ class merchant extends ecjia_merchant {
 		$this->assign('form_action', RC_Uri::url('groupbuy/merchant/update'));
 		$this->assign_lang();
 		
+		$shop_price = RC_DB::table('goods')->where('store_id', $_SESSION['store_id'])->where('goods_id', $group_buy['goods_id'])->pluck('shop_price');
+		$this->assign('shop_price', $shop_price);
+		
 		$this->display('group_buy_info.dwt');
 	}
 	
