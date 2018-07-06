@@ -88,11 +88,10 @@
 						<label class="control-label col-lg-2">{t}市场售价：{/t}</label>
 						<div class="col-lg-6 l_h30" id="shop_price">{if $shop_price}{$shop_price}{else}0{/if}</div>
 					</div>
-					
 								
 					<div class="form-group">
 						<label class="control-label col-lg-2">{t}价格阶梯：{/t}</label>
-						<div class="col-lg-10">
+						<div class="col-lg-6">
 							<!-- {foreach from=$group_buy.price_ladder key=key item=item} -->
 	 							<!-- {if $key eq 0} -->
 							  	<div class="time-picker">
@@ -109,6 +108,7 @@
 							  	<!-- {/if} -->
 						  	<!-- {/foreach} -->
 						</div>
+						<span class="input-must">*</span>
 					</div>
 					
 					<div class="form-group">
@@ -120,7 +120,7 @@
 								
 					<div class="form-group">
 						<div class="col-lg-offset-2 col-lg-10">
-							{if $group_buy.status neq 4}
+							{if $group_buy.status neq 4 && $group_buy.status neq 3}
 							<input name="act_id" type="hidden" id="act_id" value="{$group_buy.act_id}">
 						    <input type="submit" name="submit" value="{if $group_buy.act_id}{lang key='groupbuy::groupbuy.update'}{else}{lang key='system::system.button_submit'}{/if}" class="btn btn-info" />&nbsp;
 						   	{/if}

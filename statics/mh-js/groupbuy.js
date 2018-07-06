@@ -38,11 +38,7 @@
 								dataType : "json",
 								data: {submitname : submitname},
 								success : function(data) {
-									if (data.state == 'error') {
-										ecjia.merchant.showmessage(data);
-										return false;
-									}
-									location.href = data.refresh_url;
+									ecjia.merchant.showmessage(data);
 								}
 							});
 						}

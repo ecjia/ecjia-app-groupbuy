@@ -270,11 +270,11 @@ class merchant extends ecjia_merchant {
 			}
 	
 			$data =  array(
-				'end_time' => RC_Time::gmtime(),
+				'end_time' => RC_Time::gmtime() - 1,
 			);
 		    $this->db_goods_activity->where(array('store_id' => $_SESSION['store_id']))->where(array('act_id' => $group_buy_id))->update($data);
 
-			$this->showmessage(RC_Lang::get('groupbuy::groupbuy.edit_success'), ecjia::MSGTYPE_JSON | ecjia::MSGSTAT_SUCCESS, array('refresh_url' => RC_Uri::url('groupbuy/merchant/edit', array('id' => $group_buy_id))));
+			$this->showmessage(RC_Lang::get('groupbuy::groupbuy.edit_success'), ecjia::MSGTYPE_JSON | ecjia::MSGSTAT_SUCCESS, array('pjaxurl' => RC_Uri::url('groupbuy/merchant/edit', array('id' => $group_buy_id))));
 		} elseif ($submitname == 'succeed') {
 			if ($group_buy['status'] != GBS_FINISHED) {
 				$this->showmessage(RC_Lang::get('groupbuy::groupbuy.error_status'), ecjia::MSGTYPE_JSON | ecjia::MSGSTAT_ERROR);
@@ -592,8 +592,8 @@ class merchant extends ecjia_merchant {
 		$db_goods->where(RC_DB::raw('g.act_type'), GAT_GROUP_BUY);
 		
 		$msg_count = $db_goods->select(RC_DB::raw('count(*) as count'),
-				RC_DB::raw('SUM(IF(g.is_finished = 1, 1, 0)) as on_going'),
-				RC_DB::raw('SUM(IF(g.is_finished = 2, 1, 0)) as uncheck'),
+				RC_DB::raw('SUM(IF(g.is_finished = 0 and g.start_time < '.$time.' and g.end_time > '.$time.', 1, 0)) as on_going'),
+				RC_DB::raw('SUM(IF(g.is_finished = 0 and g.start_time < '.$time.' and g.end_time < '.$time.', 1, 0)) as uncheck'),
 				RC_DB::raw('SUM(IF(g.is_finished = 3, 1, 0)) as successed'),
 				RC_DB::raw('SUM(IF(g.is_finished = 4, 1, 0)) as failed')
 			)->first();
@@ -607,10 +607,10 @@ class merchant extends ecjia_merchant {
 		);
 
 		if ($filter['type'] == 'on_going') {
-			$db_goods->where(RC_DB::raw('g.is_finished'), 1);
+			$db_goods->where(RC_DB::raw('g.is_finished'), 0)->where(RC_DB::raw('g.start_time'), '<', $time)->where(RC_DB::raw('g.end_time'), '>', $time);
 		}
 		if ($filter['type'] == 'uncheck') {
-			$db_goods->where(RC_DB::raw('g.is_finished'), 2);
+			$db_goods->where(RC_DB::raw('g.is_finished'), 0)->where(RC_DB::raw('g.start_time'), '<', $time)->where(RC_DB::raw('g.end_time'), '<', $time);
 		}
 		if ($filter['type'] == 'successed') {
 			$db_goods->where(RC_DB::raw('g.is_finished'), 3);
@@ -788,8 +788,8 @@ class merchant extends ecjia_merchant {
 		$group_buy = array_merge ( $group_buy, $ext_info );
 
 		/* 格式化时间 */
-		$group_buy ['formated_start_date'] = RC_Time::local_date('Y/m/d H:i:s', $group_buy ['start_time'] );
-		$group_buy ['formated_end_date'] = RC_Time::local_date('Y/m/d H:i:s', $group_buy ['end_time'] );
+		$group_buy ['formated_start_date'] = RC_Time::local_date('Y-m-d H:i:s', $group_buy ['start_time'] );
+		$group_buy ['formated_end_date'] = RC_Time::local_date('Y-m-d H:i:s', $group_buy ['end_time'] );
 
 		/* 格式化保证金 */
 		$group_buy ['formated_deposit'] = price_format ( $group_buy ['deposit'], false );
