@@ -69,9 +69,9 @@
 							</div>
 						</td>
 						<td class="ecjiafc-red">{$list.merchants_name}</td>
-						<td>{$list.restrict_amount}</td>
-						<td>{$list.valid_order}</td>
-						<td>{$list.deposit}</td>
+						<td>{if $list.restrict_amount}{$list.restrict_amount}{else}0{/if}</td>
+						<td>{if $list.valid_order}{$list.valid_order}{else}0{/if}</td>
+						<td>{if $list.deposit}{$list.deposit}{else}0{/if}</td>
 						<td>{$list.cur_price}</td>
 						<td>{$list.end_time}</td>
 						<td>{$list.cur_status}</td>
