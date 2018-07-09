@@ -47,11 +47,6 @@
 defined('IN_ECJIA') or exit('No permission resources.');
 
 class merchant extends ecjia_merchant {
-	private $db_goods_activity;
-	private $db_order_info;
-	private $db_order_goods;
-	private $dbview;
-	private $db_goods;
 	public function __construct() {
 		parent::__construct();
 
@@ -62,12 +57,6 @@ class merchant extends ecjia_merchant {
 		RC_Loader::load_app_func('order', 'orders');
 		RC_Loader::load_app_func('admin_category', 'goods');
 	
-		$this->db_goods_activity = RC_Loader::load_app_model('goods_activity_model', 'goods');
-		$this->db_order_goods = RC_Loader::load_app_model('order_goods_model', 'orders');
-		$this->db_order_info = RC_Loader::load_app_model('order_info_model', 'orders');
-		// $this->dbview = RC_Model::model('orders/order_info_viewmodel');
-		$this->db_goods = RC_Loader::load_app_model('goods_model', 'goods');
-		
 		/* 加载全局 js/css */
 		RC_Script::enqueue_script('jquery-validate');
 		RC_Script::enqueue_script('jquery-form');
@@ -151,7 +140,7 @@ class merchant extends ecjia_merchant {
 			return $this->showmessage('您选择的商品目前有一个团购活动正在进行,请选择其他商品！', ecjia::MSGTYPE_JSON | ecjia::MSGSTAT_ERROR);
 		}
 
-		$goods_name = $this->db_goods->where(array('goods_id' => $goods_id))->get_field('goods_name');
+		$goods_name = RC_DB::table('goods')->where('store_id', $_SESSION['store_id'])->where('goods_id', $goods_id)->pluck('goods_name');
 		$act_name = $goods_name;
 		
 		RC_Loader::load_app_func('admin_goods', 'goods');
@@ -217,7 +206,7 @@ class merchant extends ecjia_merchant {
 			))
 		);
 
-		$groupbuy_id = $this->db_goods_activity->insert($data);
+		$groupbuy_id = RC_DB::table('goods_activity')->insertGetId($data);
 		
 		$links[] = array('text' => __('返回团购活动列表'), 'href'=> RC_Uri::url('groupbuy/merchant/init'));
 		$links[] = array('text' => '继续添加团购活动', 'href'=> RC_Uri::url('groupbuy/merchant/add'));
@@ -277,7 +266,7 @@ class merchant extends ecjia_merchant {
 			$data =  array(
 				'end_time' => RC_Time::gmtime() - 1,
 			);
-		    $this->db_goods_activity->where(array('store_id' => $_SESSION['store_id']))->where(array('act_id' => $group_buy_id))->update($data);
+		    RC_DB::table('goods_activity')->where('store_id', $_SESSION['store_id'])->where('act_id', $group_buy_id)->update($data);
 
 			return $this->showmessage(RC_Lang::get('groupbuy::groupbuy.edit_success'), ecjia::MSGTYPE_JSON | ecjia::MSGSTAT_SUCCESS, array('pjaxurl' => RC_Uri::url('groupbuy/merchant/edit', array('id' => $group_buy_id))));
 		} elseif ($submitname == 'succeed') {
@@ -286,14 +275,21 @@ class merchant extends ecjia_merchant {
 			}
 	
 			if ($group_buy['total_order'] > 0) {
-				$order_id_list = $this->db_order_info->where('extension_code = "group_buy" AND extension_id = '.$group_buy_id.' AND (order_status = ' . OS_CONFIRMED . ' or order_status = ' . OS_UNCONFIRMED . ')')->get_field('order_id',true);
+				$order_id_list = RC_DB::table('order_info')
+					->where('extension_code', 'group_buy')
+					->where('extension_id', $group_buy_id)
+					->where('order_status', OS_CONFIRMED)
+					->orWhere('order_status', OS_UNCONFIRMED)
+					->lists('order_id');
+					
 				$final_price = $group_buy['trans_price'];
 
 				$data = array(
 					'goods_price' => $final_price
 				);
-		        $this->db_order_goods->in(array('order_id'=>$order_id_list))->update($data);
-		        $res = $this->db_order_goods->field('order_id, SUM(goods_number * goods_price) AS goods_amount')->in(array('order_id' => $order_id_list))->order('order_id asc')->select();
+		        RC_DB::table('order_goods')->whereIn('order_id', $order_id_list)->update($data);
+		        
+		        $res = RC_DB::table('order_goods')->select('order_id', RC_DB::raw('SUM(goods_number * goods_price) AS goods_amount'))->whereIn('order_id', $order_id_list)->orderBy('order_id', 'asc')->get();
 		        
 				if (!empty($res)) {
 					foreach ($res as $row) {
@@ -356,7 +352,8 @@ class merchant extends ecjia_merchant {
 			$data = array(
 				'is_finished' => GBS_SUCCEED
 			);
-			$this->db_goods_activity->where(array('store_id' => $_SESSION['store_id']))->where(array('act_id' => $group_buy_id ))->update($data);
+			
+			RC_DB::table('goods_activity')->where('store_id', $_SESSION['store_id'])->where('act_id', $group_buy_id)->update($data);
 			/* 提示信息 */
 			$links[] = array('href' => RC_Uri::url('groupbuy/merchant/init'), 'text' => RC_Lang::get('groupbuy::groupbuy.back_list'));
 			return $this->showmessage(RC_Lang::get('groupbuy::groupbuy.edit_success'), ecjia::MSGTYPE_JSON|ecjia::MSGSTAT_SUCCESS, array('links' => $links, 'pjaxurl' => RC_Uri::url('groupbuy/merchant/edit', array('id' => $group_buy_id))));
@@ -365,7 +362,13 @@ class merchant extends ecjia_merchant {
 				return $this->showmessage(RC_Lang::get('groupbuy::groupbuy.error_status'), ecjia::MSGTYPE_JSON | ecjia::MSGSTAT_ERROR);
 			}
 			if ($group_buy['valid_order'] > 0) {
-				$res = $this->db_order_info->where('extension_code = "group_buy" AND extension_id = '.$group_buy_id.' AND (order_status = ' . OS_CONFIRMED . ' OR order_status = ' . OS_UNCONFIRMED . ')')->select();
+				$res = RC_DB::table('order_info')
+					->where('extension_code', 'group_buy')
+					->where('extension_id', $group_buy_id)
+					->where('order_status', OS_CONFIRMED)
+					->orWhere('order_status', OS_UNCONFIRMED)
+					->get();
+				
 				if (!empty($res)) {
 					foreach ($res as $order) {
 						// 修改订单状态为已取消，付款状态为未付款
@@ -393,9 +396,11 @@ class merchant extends ecjia_merchant {
 				'is_finished' => GBS_FAIL,
 				'act_desc'    => $_POST['act_desc']
 			);
-			$this->db_goods_activity->where(array('store_id' => $_SESSION['store_id']))->where(array('act_id' => $group_buy_id))->update($data);
+			RC_DB::table('goods_activity')->where('store_id', $_SESSION['store_id'])->where('act_id', $group_buy_id)->update($data);
+			
 			return $this->showmessage(RC_Lang::get('groupbuy::groupbuy.edit_success'), ecjia::MSGTYPE_JSON|ecjia::MSGSTAT_SUCCESS, array('pjaxurl' => RC_Uri::url('groupbuy/merchant/edit', array('id' => $group_buy_id))));
 		} elseif ($submitname == 'mail') {
+			
 			if ($group_buy['status'] != GBS_SUCCEED) {
 				return $this->showmessage(RC_Lang::get('groupbuy::groupbuy.error_status'), ecjia::MSGTYPE_JSON | ecjia::MSGSTAT_ERROR);
 			}
@@ -405,17 +410,13 @@ class merchant extends ecjia_merchant {
 			$count = 0;
 			$send_count = 0;
 			
- 			$this->dbview->view = array(
-	  			'order_goods' => array(
-	  				'type'  => Component_Model_View::TYPE_LEFT_JOIN,
-	  				'alias' => 'g',
-	  				'on'    => 'o.order_id = g.order_id',
-  				)
-  			);
-			    
-			$field = array('o.consignee, o.add_time, g.goods_number, o.order_sn, o.order_amount, o.order_id, o.email');
-		    $where = "o.extension_code = 'group_buy' AND o.extension_id = '$group_buy_id' AND o.order_status = '" . OS_CONFIRMED . "'";
-		    $res = $this->dbview->field($field)->where($where)->select();
+		    $res = RC_DB::table('order_info as o')->leftJoin('order_goods as g', RC_DB::raw('o.order_id'), '=', RC_DB::raw('g.order_id'))
+			    ->selectRaw('o.consignee, o.add_time, g.goods_number, o.order_sn, o.order_amount, o.order_id, o.email')
+			    ->where(RC_DB::raw('o.extension_code'), 'group_buy')
+			    ->where(RC_DB::raw('o.extension_id'), $group_buy_id)
+			    ->where(RC_DB::raw('o.order_status'), OS_CONFIRMED)
+			    ->get();
+		    
 		  
 			if (!empty($res)) {
 				$record_count = array('empty_mail' => 0, 'send_success' => 0, 'send_error' => 0, 'noeffect' => 0);
@@ -437,6 +438,8 @@ class merchant extends ecjia_merchant {
 				}
 			}
 			return $this->showmessage('邮件发送成功！', ecjia::MSGTYPE_JSON | ecjia::MSGSTAT_SUCCESS, array('pjaxurl' => RC_Uri::url('groupbuy/merchant/edit', array('id' => $group_buy_id))));
+			
+			
 		} else {
 			$goods_id = intval($_POST['goods_id']);
 			
@@ -451,7 +454,7 @@ class merchant extends ecjia_merchant {
 				return $this->showmessage('商品有属性价格时，不可添加未团购商品！', ecjia::MSGTYPE_JSON | ecjia::MSGSTAT_ERROR);
 			}
 			
-			$goods_name = $this->db_goods->where(array('goods_id' => $goods_id))->get_field('goods_name');
+			$goods_name = RC_DB::table('goods')->where('store_id', $_SESSION['store_id'])->where('goods_id', $goods_id)->pluck('goods_name');
 			$act_name = $goods_name;
 			
 			$act_desc 		 = !empty($_POST['act_desc']) 		 ? trim($_POST['act_desc'])  : '';
@@ -510,7 +513,8 @@ class merchant extends ecjia_merchant {
 					'deposit'           => $deposit
 				))
 			);
-			$this->db_goods_activity->where(array('store_id' => $_SESSION['store_id']))->where(array('act_id' => $group_buy_id))->update($data);
+			RC_DB::table('goods_activity')->where('store_id', $_SESSION['store_id'])->where('act_id', $group_buy_id)->update($data);
+			
 			ecjia_merchant::admin_log($goods_name, 'edit', 'group_buy');
 			return $this->showmessage('编辑团购商品成功！', ecjia::MSGTYPE_JSON | ecjia::MSGSTAT_SUCCESS, array('pjaxurl' => RC_Uri::url('groupbuy/merchant/edit', array('id' => $group_buy_id))));
 		}
@@ -534,10 +538,11 @@ class merchant extends ecjia_merchant {
 		} else {
             $arr = explode(',', $group_buy_id);
             foreach ($arr as $val) {
-                $goods_name = $this->db_goods_activity->where(array('act_id' => $val))->get_field('goods_name');
-                ecjia_merchant::admin_log('团购商品是'.$goods_name, 'batch_remove', 'group_buy');
+                $goods_name = RC_DB::table('goods_activity')->where('store_id', $_SESSION['store_id'])->where('act_id', $val)->pluck('goods_name');
+                ecjia_merchant::admin_log('团购商品名称是'.$goods_name, 'batch_remove', 'group_buy');
             }
-			$this->db_goods_activity->where(array('store_id' => $_SESSION['store_id']))->in(array('act_id' => $group_buy_id))->delete();
+			RC_DB::table('goods_activity')->where('store_id', $_SESSION['store_id'])->whereIn('act_id', $group_buy_id)->delete();
+			
 			return $this->showmessage('批量删除操作成功', ecjia::MSGTYPE_JSON | ecjia::MSGSTAT_SUCCESS, array('pjaxurl' => RC_Uri::url('groupbuy/merchant/init')));
 		}
 	}
@@ -689,8 +694,14 @@ class merchant extends ecjia_merchant {
 	 * @return  array
 	 */
 	private function goods_group_buy($goods_id) {
-		$db_goods_activity = RC_Loader::load_app_model('goods_activity_model', 'goods');
-		return $db_goods_activity->where(array('store_id' => $_SESSION['store_id']))->find('goods_id = '.$goods_id.' AND act_type = "' . GAT_GROUP_BUY . '" AND start_time <= ' . RC_Time::gmtime().' AND end_time >= ' . RC_Time::gmtime().' ');
+		$time = RC_Time::gmtime();
+		return RC_DB::table('goods_activity')
+			->where('store_id', $_SESSION['store_id'])
+			->where('goods_id', $goods_id)
+			->where('act_type', GAT_GROUP_BUY)
+			->where('start_time', '<=', $time)
+			->where('end_time', '>=', $time)
+			->first();
 	}
 	
 	/*
@@ -704,19 +715,19 @@ class merchant extends ecjia_merchant {
 	*/
 	private function group_buy_stat($group_buy_id, $deposit) {
 		$group_buy_id = intval ( $group_buy_id );
-		$db = RC_Model::model('goods/goods_activity_model');
+// 		$db = RC_Model::model('goods/goods_activity_model');
 		// $dbview = RC_Model::model('goods/order_info_viewmodel');
-		$group_buy_goods_id = $db->where(array('act_id' => $group_buy_id,'act_type' => GAT_GROUP_BUY))->get_field('goods_id');
+// 		$group_buy_goods_id = $db->where(array('act_id' => $group_buy_id,'act_type' => GAT_GROUP_BUY))->get_field('goods_id');
 
 		/* 取得总订单数和总商品数 */
-		$dbview->view = array (
-			'order_goods' => array (
-				'type' 	=> Component_Model_View::TYPE_LEFT_JOIN,
-				'alias' => 'g',
-				'field' => 'COUNT(*) AS total_order, SUM(g.goods_number) AS total_goods',
-				'on' 	=> 'o.order_id = g.order_id '
-			)
-		);
+// 		$dbview->view = array (
+// 			'order_goods' => array (
+// 				'type' 	=> Component_Model_View::TYPE_LEFT_JOIN,
+// 				'alias' => 'g',
+// 				'field' => 'COUNT(*) AS total_order, SUM(g.goods_number) AS total_goods',
+// 				'on' 	=> 'o.order_id = g.order_id '
+// 			)
+// 		);
 
 		// $stat = $dbview->find ( "o.extension_code = 'group_buy' AND o.extension_id = '$group_buy_id' AND g.goods_id = '$group_buy_goods_id' 
 		// AND (order_status = '" . OS_CONFIRMED . "' OR order_status = '" . OS_UNCONFIRMED . "')" );
@@ -787,10 +798,19 @@ class merchant extends ecjia_merchant {
 	 * @return array status 状态：
 	 */
 	private function group_buy_info($group_buy_id, $current_num = 0) {
-		$db = RC_Model::model('goods/goods_activity_model');
+// 		$db = RC_Model::model('goods/goods_activity_model');
 		/* 取得团购活动信息 */
 		$group_buy_id = intval ( $group_buy_id );
-		$group_buy = $db->where(array('store_id', $_SESSION['store_id']))->field( '*,act_id as group_buy_id, act_desc as group_buy_desc, start_time as start_date, end_time as end_date' )->find(array('act_id' => $group_buy_id, 'act_type' => GAT_GROUP_BUY));
+// 		$group_buy = $db->where(array('store_id', $_SESSION['store_id']))->field(  )
+// 			->find(array('act_id' => $group_buy_id, 'act_type' => GAT_GROUP_BUY));
+		
+		$group_buy = RC_DB::table('goods_activity')
+			->where('store_id', $_SESSION['store_id'])
+			->where('act_id', $group_buy_id)
+			->where('act_type', GAT_GROUP_BUY)
+			->selectRaw('*,act_id as group_buy_id, act_desc as group_buy_desc, start_time as start_date, end_time as end_date')
+			->first();
+		
 		/* 如果为空，返回空数组 */
 		if (empty ( $group_buy )) {
 			return array ();
