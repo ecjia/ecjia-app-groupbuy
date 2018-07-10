@@ -688,6 +688,7 @@ class merchant extends ecjia_merchant
                 $arr['end_time'] = RC_Time::local_date('Y-m-d H:i:s', $arr['end_time']);
                 $arr['cur_status'] = RC_Lang::get('groupbuy::groupbuy.gbs.' . $status);
                 $arr['merchants_name'] = $row['merchants_name'];
+                $arr['status'] = $status;
                 $res[] = $arr;
             }
         }
