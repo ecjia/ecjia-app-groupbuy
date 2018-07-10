@@ -301,7 +301,7 @@ class merchant extends ecjia_merchant
                         $goods_amount = floatval($row['goods_amount']);
 
                         /* 取得订单信息 */
-                        $order = RC_Api::api('orders', 'order_info', array('order_id' => $order_id, 'order_sn' => ''));
+                        $order = RC_Api::api('orders', 'merchant_order_info', array('order_id' => $order_id, 'order_sn' => ''));
                         /* 判断订单是否有效：余额支付金额 + 已付款金额 >= 保证金 */
                         if ($order['surplus'] + $order['money_paid'] >= $group_buy['deposit']) {
                             $order['goods_amount'] = $goods_amount;
@@ -344,7 +344,7 @@ class merchant extends ecjia_merchant
                                 $order['surplus'] = 0;
                                 $order['money_paid'] = 0;
                                 $order['order_amount'] = $money;
-//                                 order_refund($order, 1, RC_Lang::get('groupbuy::groupbuy.cancel_order_reason') . ':' . $order['order_sn']);
+                                order_refund($order, 1, RC_Lang::get('groupbuy::groupbuy.cancel_order_reason') . ':' . $order['order_sn']);
                             }
                             /* 更新订单 */
                             update_order($order['order_id'], $order);
