@@ -53,12 +53,9 @@ class merchant extends ecjia_merchant
         parent::__construct();
 
         RC_Lang::load('groupbuy');
-        RC_Loader::load_app_func('common', 'goods');
-        RC_Loader::load_app_func('category', 'goods');
-        RC_Loader::load_app_func('goods', 'goods');
-        RC_Loader::load_app_func('order', 'orders');
         RC_Loader::load_app_func('admin_category', 'goods');
-
+        RC_Loader::load_app_func('admin_order', 'orders');
+        
         /* 加载全局 js/css */
         RC_Script::enqueue_script('jquery-validate');
         RC_Script::enqueue_script('jquery-form');
@@ -124,7 +121,7 @@ class merchant extends ecjia_merchant
         );
         $this->assign('group_buy', $group_buy);
         $this->assign('cat_list', cat_list());
-        $this->assign('brand_list', get_brand_list());
+//         $this->assign('brand_list', get_brand_list());
         $this->assign('action', 'insert');
         $this->assign('form_action', RC_Uri::url('groupbuy/merchant/insert'));
         $this->assign_lang();
@@ -309,8 +306,8 @@ class merchant extends ecjia_merchant
                         if ($order['surplus'] + $order['money_paid'] >= $group_buy['deposit']) {
                             $order['goods_amount'] = $goods_amount;
                             if ($order['insure_fee'] > 0) {
-                                $shipping = shipping_info($order['shipping_id']);
-                                $order['insure_fee'] = shipping_insure_fee($shipping['shipping_code'], $goods_amount, $shipping['insure']);
+                                $shipping = ecjia_shipping::getPluginDataById($order['shipping_id']);
+                                $order['insure_fee'] = ecjia_shipping::insureFee($shipping['shipping_code'], $goods_amount, $shipping['insure']);
                             }
                             // 重算支付费用
                             $order['order_amount'] = $order['goods_amount'] + $order['shipping_fee']
