@@ -120,8 +120,8 @@
 								
 					<div class="form-group">
 						<div class="col-lg-offset-2 col-lg-10">
-							{if $group_buy.status neq 4 && $group_buy.status neq 3}
 							<input name="act_id" type="hidden" id="act_id" value="{$group_buy.act_id}">
+							{if $group_buy.status neq 4 && $group_buy.status neq 3}
 						    <input type="submit" name="submit" value="{if $group_buy.act_id}{lang key='groupbuy::groupbuy.update'}{else}{lang key='system::system.button_submit'}{/if}" class="btn btn-info" />&nbsp;
 						   	{/if}
 
