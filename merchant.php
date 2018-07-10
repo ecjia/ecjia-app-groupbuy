@@ -740,7 +740,21 @@ class merchant extends ecjia_merchant
         /* 取得有效订单数和有效商品数 */
         $deposit = floatval($deposit);
         if ($deposit > 0 && $stat['total_order'] > 0) {
-
+        	$row = RC_DB::table('order_info as o')->leftJoin('order_goods as g', RC_DB::raw('o.order_id'), '=', RC_DB::raw('g.order_id'))
+	            ->select(RC_DB::raw('COUNT(*) AS total_order'), RC_DB::raw('SUM(g.goods_number) AS total_goods'))
+	            ->where(RC_DB::raw('o.extension_code'), 'group_buy')
+	            ->where(RC_DB::raw('o.extension_id'), $group_buy_id)
+	            ->where(RC_DB::raw('g.goods_id'), $group_buy_goods_id)
+	            ->whereRaw("(order_status = '" . OS_CONFIRMED . "' OR order_status = '" . OS_UNCONFIRMED . "')")
+	            ->whereRaw("(o.money_paid + o.surplus) >= '$deposit'")
+	            ->first();
+        	$stat['valid_order'] = $row['total_order'];
+        	if ($stat['valid_order'] == 0) {
+        		$stat['valid_goods'] = 0;
+        	} else {
+        		$stat['valid_goods'] = $row['total_goods'];
+        	}
+        	
         } else {
             $stat['valid_order'] = $stat['total_order'];
             $stat['valid_goods'] = $stat['total_goods'];

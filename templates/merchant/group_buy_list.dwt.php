@@ -79,14 +79,14 @@
 								<div class="edit-list">
 								{assign var=edit_url value=RC_Uri::url('groupbuy/merchant/edit',"id={$list.act_id}")}
 								<a class="data-pjax" href="{$edit_url}" title="{t}编辑{/t}">{t}编辑{/t}</a>&nbsp;|&nbsp;
-								<a href="{RC_Uri::url('orders/merchant/init')}&group_buy_id={$list.act_id}" title="{t}查看{/t}" target="__blank">{t}查看订单{/t}</a>&nbsp;|&nbsp;
+								<a href="{RC_Uri::url('orders/merchant/init')}&group_buy_id={$list.act_id}" title="{t}查看{/t}" target="__blank">{t}查看订单{/t}</a>
 								{if $list.status neq 0 && $list.status neq 1}
-								<a class="ajaxremove ecjiafc-red" data-toggle="ajaxremove" data-msg="您确定要删除这条记录吗？" href='{RC_Uri::url("groupbuy/merchant/remove","id={$list.act_id}")}' title="{t}删除{/t}">{t}删除{/t}</a> 
+								<a class="ajaxremove ecjiafc-red" data-toggle="ajaxremove" data-msg="您确定要删除这条记录吗？" href='{RC_Uri::url("groupbuy/merchant/remove","id={$list.act_id}")}' title="{t}删除{/t}">&nbsp;|&nbsp;{t}删除{/t}</a> 
 								{/if}
 								</div>
 							</td>
 							<td>{if $list.restrict_amount}{$list.restrict_amount}{else}0{/if}</td>
-							<td>{if $list.valid_order}{$list.valid_order}{else}0{/if}</td>
+							<td>{if $list.total_order}{$list.total_order}{else}0{/if}</td>
 							<td>{if $list.deposit}{$list.deposit}{else}0{/if}</td>
 							<td>{$list.cur_price}</td>
 							<td>{$list.end_time}</td>
