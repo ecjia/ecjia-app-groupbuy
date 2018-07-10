@@ -304,7 +304,7 @@ class merchant extends ecjia_merchant
                         $goods_amount = floatval($row['goods_amount']);
 
                         /* 取得订单信息 */
-                        $order = order_info($order_id);
+                        $order = RC_Api::api('orders', 'order_info', array('order_id' => $order_id, 'order_sn' => ''));
                         /* 判断订单是否有效：余额支付金额 + 已付款金额 >= 保证金 */
                         if ($order['surplus'] + $order['money_paid'] >= $group_buy['deposit']) {
                             $order['goods_amount'] = $goods_amount;
