@@ -24,7 +24,8 @@
 				startView: 2,
 //				minView: 2,
 				forceParse: 0,
-				minuteStep: 1
+				minuteStep: 1,
+				container: '.main_content',
 			});
 			
 			$(".all").on('click', function(e){
