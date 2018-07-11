@@ -861,7 +861,7 @@ class merchant extends ecjia_merchant
 
         $group_buy['start_time'] = $group_buy['formated_start_date'];
         $group_buy['end_time'] = $group_buy['formated_end_date'];
-        
+
         return $group_buy;
     }
 }
