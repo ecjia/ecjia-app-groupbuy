@@ -55,7 +55,8 @@ class merchant extends ecjia_merchant
         RC_Lang::load('groupbuy');
         RC_Loader::load_app_func('admin_category', 'goods');
         RC_Loader::load_app_func('admin_order', 'orders');
-
+        RC_Loader::load_app_func('global', 'goods');
+        
         /* 加载全局 js/css */
         RC_Script::enqueue_script('jquery-validate');
         RC_Script::enqueue_script('jquery-form');
@@ -289,9 +290,9 @@ class merchant extends ecjia_merchant
                 $data = array(
                     'goods_price' => $final_price,
                 );
-                RC_DB::table('order_goods')->whereIn('order_id', $order_id_list)->update($data);
+                RC_DB::table('order_goods')->whereRaw("order_id " . db_create_in($order_id_list))->update($data);
 
-                $res = RC_DB::table('order_goods')->select('order_id', RC_DB::raw('SUM(goods_number * goods_price) AS goods_amount'))->whereIn('order_id', $order_id_list)->orderBy('order_id', 'asc')->get();
+                $res = RC_DB::table('order_goods')->select('order_id', RC_DB::raw('SUM(goods_number * goods_price) AS goods_amount'))->whereRaw("order_id " . db_create_in($order_id_list))->groupBy('order_id')->get();
 
                 if (!empty($res)) {
                     foreach ($res as $row) {
@@ -312,11 +313,11 @@ class merchant extends ecjia_merchant
                             $order['order_amount'] = $order['goods_amount'] + $order['shipping_fee']
                                  + $order['insure_fee'] + $order['pack_fee'] + $order['card_fee']
                                  - $order['money_paid'] - $order['surplus'];
-                            if ($order['order_amount'] > 0) {
+//                             if ($order['order_amount'] > 0) {
                                 $order['pay_fee'] = pay_fee($order['pay_id'], $order['order_amount']);
-                            } else {
-                                $order['pay_fee'] = 0;
-                            }
+//                             } else {
+//                                 $order['pay_fee'] = 0;
+//                             }
 
                             $order['order_amount'] += $order['pay_fee'];
                             if ($order['order_amount'] > 0) {

@@ -23,8 +23,7 @@
 					todayHighlight: 1,
 					startView: 2,
 					forceParse: 0,
-					minuteStep: 1,
-					container: '.main_content',
+					minuteStep: 1
 				});
 
 				$(".all").on('click', function (e) {
