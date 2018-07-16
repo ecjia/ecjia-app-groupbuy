@@ -310,7 +310,7 @@ class merchant extends ecjia_merchant
                                 $order['insure_fee'] = ecjia_shipping::insureFee($shipping['shipping_code'], $goods_amount, $shipping['insure']);
                             }
                             // 重算支付费用
-                            $order['order_amount'] = $order['goods_amount'] + $order['shipping_fee']
+                            $order['order_amount'] = $order['goods_amount'] + $order['shipping_fee'] + $order['tax']
                                  + $order['insure_fee'] + $order['pack_fee'] + $order['card_fee']
                                  - $order['money_paid'] - $order['surplus'];
 //                             if ($order['order_amount'] > 0) {

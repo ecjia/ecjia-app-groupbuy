@@ -385,14 +385,14 @@ class admin extends ecjia_admin
                                 $order['insure_fee'] = ecjia_shipping::insureFee($shipping['shipping_code'], $goods_amount, $shipping['insure']);
                             }
                             // 重算支付费用
-                            $order['order_amount'] = $order['goods_amount'] + $order['shipping_fee']
+                            $order['order_amount'] = $order['goods_amount'] + $order['shipping_fee'] + $order['tax']
                                  + $order['insure_fee'] + $order['pack_fee'] + $order['card_fee']
                                  - $order['money_paid'] - $order['surplus'];
-                            if ($order['order_amount'] > 0) {
+                            // if ($order['order_amount'] > 0) {
                                 $order['pay_fee'] = pay_fee($order['pay_id'], $order['order_amount']);
-                            } else {
-                                $order['pay_fee'] = 0;
-                            }
+                            // } else {
+                                // $order['pay_fee'] = 0;
+                            // }
 
                             $order['order_amount'] += $order['pay_fee'];
                             if ($order['order_amount'] > 0) {
