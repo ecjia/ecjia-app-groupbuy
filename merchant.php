@@ -406,7 +406,7 @@ class merchant extends ecjia_merchant
                 return $this->showmessage(RC_Lang::get('groupbuy::groupbuy.error_status'), ecjia::MSGTYPE_JSON | ecjia::MSGSTAT_ERROR);
             }
             $res = RC_DB::table('order_info as o')->leftJoin('order_goods as g', RC_DB::raw('o.order_id'), '=', RC_DB::raw('g.order_id'))
-                ->selectRaw('o.consignee, o.add_time, g.goods_number, o.order_sn, o.order_amount, o.order_id, o.email')
+                ->selectRaw('o.consignee, g.goods_name')
                 ->where(RC_DB::raw('o.extension_code'), 'group_buy')
                 ->where(RC_DB::raw('o.extension_id'), $group_buy_id)
                 ->where(RC_DB::raw('o.order_status'), OS_CONFIRMED)
@@ -416,11 +416,8 @@ class merchant extends ecjia_merchant
                 foreach ($res as $order) {
                     $options = array(
                         'user_name' => $order['consignee'],
-                        'order_time' => RC_Time::local_date('Y-m-d H:i:s', $order['add_time']),
                         'store_name' => $_SESSION['store_name'],
-                        'goods_number' => $order['goods_number'],
-                        'order_sn' => $order['sn'],
-                        'order_amount' => price_format($order['order_amount']),
+                    	'goods_name' => $order['goods_name']
                     );
                     RC_Api::api('sms', 'sms_groupbuy_activity_succeed', $options);
                 }
