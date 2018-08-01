@@ -52,7 +52,6 @@ class merchant extends ecjia_merchant
     {
         parent::__construct();
 
-        RC_Lang::load('groupbuy');
         RC_Loader::load_app_func('admin_category', 'goods');
         RC_Loader::load_app_func('admin_order', 'orders');
         RC_Loader::load_app_func('global', 'goods');

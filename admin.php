@@ -52,7 +52,6 @@ class admin extends ecjia_admin
     {
         parent::__construct();
 
-        RC_Lang::load('groupbuy');
         RC_Loader::load_app_func('admin_category', 'goods');
         RC_Loader::load_app_func('admin_order', 'orders');
 
