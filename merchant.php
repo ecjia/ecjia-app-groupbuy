@@ -279,19 +279,24 @@ class merchant extends ecjia_merchant
                 return $this->showmessage(RC_Lang::get('groupbuy::groupbuy.error_status'), ecjia::MSGTYPE_JSON | ecjia::MSGSTAT_ERROR);
             }
             if ($group_buy['total_order'] > 0) {
-                $order_id_list = RC_DB::table('order_info')
-                    ->where('extension_code', 'group_buy')
-                    ->where('extension_id', $group_buy_id)
-                    ->whereIn('order_status', array(OS_CONFIRMED, OS_UNCONFIRMED))
-                    ->lists('order_id');
-                $final_price = $group_buy['trans_price'];
-
-                $data = array(
-                    'goods_price' => $final_price,
-                );
-                RC_DB::table('order_goods')->whereRaw("order_id " . db_create_in($order_id_list))->update($data);
-
-                $res = RC_DB::table('order_goods')->select('order_id', RC_DB::raw('SUM(goods_number * goods_price) AS goods_amount'))->whereRaw("order_id " . db_create_in($order_id_list))->groupBy('order_id')->get();
+                $list = RC_DB::table('order_info as oi')
+                	->leftJoin('order_goods as og', RC_DB::raw('oi.order_id'), '=', RC_DB::raw('og.order_id'))
+                    ->where(RC_DB::raw('oi.extension_code'), 'group_buy')
+                    ->where(RC_DB::raw('oi.extension_id'), $group_buy_id)
+                    ->whereIn(RC_DB::raw('oi.order_status'), array(OS_CONFIRMED, OS_UNCONFIRMED))
+                    ->select(RC_DB::raw('oi.order_id'), RC_DB::raw('og.goods_number'))
+                    ->get();
+                if (!empty($list)) {
+                	foreach ($list as $k => $v) {
+                		$price = $this->group_buy_price($group_buy_id, $v['goods_number']);
+                		$data = array(
+                			'goods_price' => $price,
+                		);
+                		RC_DB::table('order_goods')->where('order_id', $v['order_id'])->update($data);
+                		$order_id_list[] = $v['order_id'];
+                	}
+                }
+                $res = RC_DB::table('order_goods')->select('order_id', RC_DB::raw('SUM(goods_number * goods_price) AS goods_amount'))->whereRaw("order_id " . ecjia_db_create_in($order_id_list))->groupBy('order_id')->get();
 
                 if (!empty($res)) {
                     foreach ($res as $row) {
@@ -861,5 +866,57 @@ class merchant extends ecjia_merchant
 
         return $group_buy;
     }
+    
+	/**
+     * 取得团购商品价格
+     *
+     * @param int $group_buy_id
+     *            团购活动id
+     * @param int $current_num
+     *            本次购买数量（计算当前价时要加上的数量）
+     * @return array status 状态：
+     */
+    private function group_buy_price($group_buy_id, $current_num = 0) {
+    	/* 取得团购活动信息 */
+    	$group_buy_id = intval($group_buy_id);
+    	$group_buy = RC_DB::table('goods_activity')
+	    	->where('store_id', $_SESSION['store_id'])
+	    	->where('act_id', $group_buy_id)
+	    	->where('act_type', GAT_GROUP_BUY)
+	    	->select('*')
+	    	->first();
+    	
+    	/* 如果为空，返回空数组 */
+    	if (empty($group_buy)) {
+    		return 0;
+    	}
+    	
+    	$ext_info = unserialize($group_buy['ext_info']);
+    	$group_buy = array_merge($group_buy, $ext_info);
+    	
+    	/* 处理价格阶梯 */
+    	$price_ladder = $group_buy['price_ladder'];
+    	if (!is_array($price_ladder) || empty($price_ladder)) {
+    		$price_ladder = array(
+    			array('amount' => 0, 'price' => 0),
+    		);
+    	} else {
+    		foreach ($price_ladder as $key => $amount_price) {
+    			$price_ladder[$key]['formated_price'] = price_format($amount_price['price'], false);
+    		}
+    	}
+    	/* 计算当前价 */
+    	$cur_price = $price_ladder[0]['price']; // 初始化
+    	$cur_amount = $current_num; // 当前数量
+    	foreach ($price_ladder as $amount_price) {
+    		if ($cur_amount >= $amount_price['amount']) {
+    			$cur_price = $amount_price['price'];
+    		} else {
+    			break;
+    		}
+    	}
+    	return $cur_price;
+    }
 }
+
 //end
