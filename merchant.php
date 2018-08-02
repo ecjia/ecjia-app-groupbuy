@@ -279,25 +279,39 @@ class merchant extends ecjia_merchant
                 return $this->showmessage(RC_Lang::get('groupbuy::groupbuy.error_status'), ecjia::MSGTYPE_JSON | ecjia::MSGSTAT_ERROR);
             }
             if ($group_buy['total_order'] > 0) {
-                $list = RC_DB::table('order_info as oi')
-                	->leftJoin('order_goods as og', RC_DB::raw('oi.order_id'), '=', RC_DB::raw('og.order_id'))
-                    ->where(RC_DB::raw('oi.extension_code'), 'group_buy')
-                    ->where(RC_DB::raw('oi.extension_id'), $group_buy_id)
-                    ->whereIn(RC_DB::raw('oi.order_status'), array(OS_CONFIRMED, OS_UNCONFIRMED))
-                    ->select(RC_DB::raw('oi.order_id'), RC_DB::raw('og.goods_number'))
-                    ->get();
-                if (!empty($list)) {
-                	foreach ($list as $k => $v) {
-                		$price = $this->group_buy_price($group_buy_id, $v['goods_number']);
-                		$data = array(
-                			'goods_price' => $price,
-                		);
-                		RC_DB::table('order_goods')->where('order_id', $v['order_id'])->update($data);
-                		$order_id_list[] = $v['order_id'];
-                	}
-                }
-                $res = RC_DB::table('order_goods')->select('order_id', RC_DB::raw('SUM(goods_number * goods_price) AS goods_amount'))->whereRaw("order_id " . ecjia_db_create_in($order_id_list))->groupBy('order_id')->get();
-
+//                 $list = RC_DB::table('order_info as oi')
+//                 	->leftJoin('order_goods as og', RC_DB::raw('oi.order_id'), '=', RC_DB::raw('og.order_id'))
+//                     ->where(RC_DB::raw('oi.extension_code'), 'group_buy')
+//                     ->where(RC_DB::raw('oi.extension_id'), $group_buy_id)
+//                     ->whereIn(RC_DB::raw('oi.order_status'), array(OS_CONFIRMED, OS_UNCONFIRMED))
+//                     ->select(RC_DB::raw('oi.order_id'), RC_DB::raw('og.goods_number'))
+//                     ->get();
+//                 if (!empty($list)) {
+//                 	foreach ($list as $k => $v) {
+//                 		$price = $this->group_buy_price($group_buy_id, $v['goods_number']);
+//                 		$data = array(
+//                 			'goods_price' => $price,
+//                 		);
+//                 		RC_DB::table('order_goods')->where('order_id', $v['order_id'])->update($data);
+//                 		$order_id_list[] = $v['order_id'];
+//                 	}
+//                 }
+//                 $res = RC_DB::table('order_goods')->select('order_id', RC_DB::raw('SUM(goods_number * goods_price) AS goods_amount'))->whereRaw("order_id " . ecjia_db_create_in($order_id_list))->groupBy('order_id')->get();
+				
+            	$order_id_list = RC_DB::table('order_info')
+	            	->where('extension_code', 'group_buy')
+	            	->where('extension_id', $group_buy_id)
+	            	->whereIn('order_status', array(OS_CONFIRMED, OS_UNCONFIRMED))
+	            	->lists('order_id');
+            	$final_price = $group_buy['trans_price'];
+            	
+            	$data = array(
+            		'goods_price' => $final_price,
+            	);
+            	RC_DB::table('order_goods')->whereRaw("order_id " . db_create_in($order_id_list))->update($data);
+            	
+            	$res = RC_DB::table('order_goods')->select('order_id', RC_DB::raw('SUM(goods_number * goods_price) AS goods_amount'))->whereRaw("order_id " . db_create_in($order_id_list))->groupBy('order_id')->get();
+            	
                 if (!empty($res)) {
                     foreach ($res as $row) {
                         $order_id = $row['order_id'];
