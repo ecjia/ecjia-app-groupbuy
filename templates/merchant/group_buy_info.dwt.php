@@ -78,7 +78,7 @@
 					</div>
 					
 					<div class="form-group" >
-						<label class="control-label col-lg-2">{t}市场售价：{/t}</label>
+						<label class="control-label col-lg-2">{t}本店售价：{/t}</label>
 						<div class="col-lg-6 l_h30" id="shop_price">{if $shop_price}{$shop_price}{else}0{/if}</div>
 					</div>
 								

@@ -249,7 +249,12 @@ class admin extends ecjia_admin
 
         $this->assign('ur_here', '更新团购商品');
         $this->assign('ur_here2', '更新团购信息');
-        $this->assign('action_link', array('href' => RC_Uri::url('groupbuy/admin/init'), 'text' => '团购活动列表'));
+        $page = !empty($_GET['page']) ? intval($_GET['page']) : 1;
+        $action_link = array('href' => RC_Uri::url('groupbuy/admin/init'), 'text' => '团购活动列表');
+        if ($page > 1) {
+        	$action_link = array('href' => RC_Uri::url('groupbuy/admin/init', array('page' => $page)), 'text' => '团购活动列表');
+        }
+        $this->assign('action_link', $action_link);
         ecjia_screen::get_current_screen()->add_nav_here(new admin_nav_here(__('更新团购活动')));
         ecjia_screen::get_current_screen()->add_help_tab(array(
             'id' => 'overview',
@@ -267,7 +272,11 @@ class admin extends ecjia_admin
         $group_buy = $this->group_buy_info($act_id);
 
         $this->assign('group_buy', $group_buy);
-        $this->assign('form_action', RC_Uri::url('groupbuy/admin/update'));
+        $url = RC_Uri::url('groupbuy/admin/update');
+        if ($page > 1) {
+        	$url = RC_Uri::url('groupbuy/admin/update', array('page' => $page));
+        }
+        $this->assign('form_action', $url);
         $this->assign_lang();
 
         $this->display('group_buy_info.dwt');
@@ -335,6 +344,7 @@ class admin extends ecjia_admin
         $group_buy = $this->group_buy_info($group_buy_id);
         $submitname = isset($_POST['submitname']) ? $_POST['submitname'] : '';
 
+        $edit_url = RC_Uri::url('groupbuy/admin/edit', array('id' => $group_buy_id));
         if ($submitname == 'finish') {
             if ($group_buy['status'] != GBS_UNDER_WAY) {
                 return $this->showmessage(RC_Lang::get('groupbuy::groupbuy.error_status'), ecjia::MSGTYPE_JSON | ecjia::MSGSTAT_ERROR);
@@ -346,7 +356,7 @@ class admin extends ecjia_admin
             RC_DB::table('goods_activity')->where('act_id', $group_buy_id)->update($data);
 
             $links[] = array('text' => RC_Lang::get('groupbuy::groupbuy.back_list'), 'href' => RC_Uri::url('groupbuy/admin/init'));
-            return $this->showmessage(RC_Lang::get('groupbuy::groupbuy.edit_success'), ecjia::MSGTYPE_JSON | ecjia::MSGSTAT_SUCCESS, array('links' => $links, 'pjaxurl' => RC_Uri::url('groupbuy/admin/edit', array('id' => $group_buy_id))));
+            return $this->showmessage(RC_Lang::get('groupbuy::groupbuy.edit_success'), ecjia::MSGTYPE_JSON | ecjia::MSGSTAT_SUCCESS, array('links' => $links, 'pjaxurl' => $edit_url));
         } elseif ($submitname == 'succeed') {
             if ($group_buy['status'] != GBS_FINISHED) {
                 return $this->showmessage(RC_Lang::get('groupbuy::groupbuy.error_status'), ecjia::MSGTYPE_JSON | ecjia::MSGSTAT_ERROR);
@@ -433,7 +443,7 @@ class admin extends ecjia_admin
             RC_DB::table('goods_activity')->where('act_id', $group_buy_id)->update($data);
             /* 提示信息 */
             $links[] = array('href' => RC_Uri::url('groupbuy/admin/init'), 'text' => RC_Lang::get('groupbuy::groupbuy.back_list'));
-            return $this->showmessage(RC_Lang::get('groupbuy::groupbuy.edit_success'), ecjia::MSGTYPE_JSON | ecjia::MSGSTAT_SUCCESS, array('links' => $links, 'pjaxurl' => RC_Uri::url('groupbuy/admin/edit', array('id' => $group_buy_id))));
+            return $this->showmessage(RC_Lang::get('groupbuy::groupbuy.edit_success'), ecjia::MSGTYPE_JSON | ecjia::MSGSTAT_SUCCESS, array('links' => $links, 'pjaxurl' => $edit_url));
         } elseif ($submitname == 'fail') {
             if ($group_buy['status'] != GBS_FINISHED) {
                 return $this->showmessage(RC_Lang::get('groupbuy::groupbuy.error_status'), ecjia::MSGTYPE_JSON | ecjia::MSGSTAT_ERROR);
@@ -474,7 +484,7 @@ class admin extends ecjia_admin
             );
             RC_DB::table('goods_activity')->where('act_id', $group_buy_id)->update($data);
 
-            return $this->showmessage(RC_Lang::get('groupbuy::groupbuy.edit_success'), ecjia::MSGTYPE_JSON | ecjia::MSGSTAT_SUCCESS, array('pjaxurl' => RC_Uri::url('groupbuy/merchant/edit', array('id' => $group_buy_id))));
+            return $this->showmessage(RC_Lang::get('groupbuy::groupbuy.edit_success'), ecjia::MSGTYPE_JSON | ecjia::MSGSTAT_SUCCESS, array('pjaxurl' => $edit_url));
         } elseif ($submitname == 'sms') {
             if ($group_buy['status'] != GBS_SUCCEED) {
                 return $this->showmessage(RC_Lang::get('groupbuy::groupbuy.error_status'), ecjia::MSGTYPE_JSON | ecjia::MSGSTAT_ERROR);
@@ -502,7 +512,7 @@ class admin extends ecjia_admin
                     RC_Api::api('sms', 'sms_groupbuy_activity_succeed', $options);
                 }
             }
-            return $this->showmessage('短信发送成功！', ecjia::MSGTYPE_JSON | ecjia::MSGSTAT_SUCCESS, array('pjaxurl' => RC_Uri::url('groupbuy/merchant/edit', array('id' => $group_buy_id))));
+            return $this->showmessage('短信发送成功！', ecjia::MSGTYPE_JSON | ecjia::MSGSTAT_SUCCESS, array('pjaxurl' => $edit_url));
 
         } else {
             $goods_id = intval($_POST['goods_id']);
@@ -580,7 +590,7 @@ class admin extends ecjia_admin
             RC_DB::table('goods_activity')->where('act_id', $group_buy_id)->update($data);
 
             ecjia_admin::admin_log($goods_name, 'edit', 'group_buy');
-            return $this->showmessage('编辑团购商品成功！', ecjia::MSGTYPE_JSON | ecjia::MSGSTAT_SUCCESS, array('pjaxurl' => RC_Uri::url('groupbuy/admin/edit', array('id' => $group_buy_id))));
+            return $this->showmessage('编辑团购商品成功！', ecjia::MSGTYPE_JSON | ecjia::MSGSTAT_SUCCESS, array('pjaxurl' => $edit_url));
         }
     }
 
