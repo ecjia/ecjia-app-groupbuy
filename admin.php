@@ -179,7 +179,7 @@ class admin extends ecjia_admin
         $act_desc = !empty($_POST['act_desc']) ? trim($_POST['act_desc']) : '';
         $price_ladder = !empty($_POST['price_ladder']) ? $_POST['price_ladder'] : '';
         $restrict_amount = !empty($_POST['restrict_amount']) ? $_POST['restrict_amount'] : '';
-        $gift_integral = !empty($_POST['gift_integral']) ? $_POST['gift_integral'] : '';
+        $gift_integral = !empty($_POST['gift_integral']) ? $_POST['gift_integral'] : 0;
         $deposit = (!empty($_POST['deposit']) && intval($_POST['deposit']) > 0) ? intval($_POST['deposit']) : 0;
 
         $price_ladder = array();
@@ -524,7 +524,7 @@ class admin extends ecjia_admin
             $act_desc = !empty($_POST['act_desc']) ? trim($_POST['act_desc']) : '';
             $price_ladder = !empty($_POST['price_ladder']) ? $_POST['price_ladder'] : '';
             $restrict_amount = !empty($_POST['restrict_amount']) ? $_POST['restrict_amount'] : '';
-            $gift_integral = !empty($_POST['gift_integral']) ? $_POST['gift_integral'] : '';
+            $gift_integral = !empty($_POST['gift_integral']) ? $_POST['gift_integral'] : 0;
             $deposit = (!empty($_POST['deposit']) && intval($_POST['deposit']) > 0) ? intval($_POST['deposit']) : 0;
 
             $price_ladder = array();
