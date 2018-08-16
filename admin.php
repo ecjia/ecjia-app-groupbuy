@@ -290,7 +290,12 @@ class admin extends ecjia_admin
         $this->admin_priv('groupbuy_update');
 
         $this->assign('ur_here', '团购活动详情');
-        $this->assign('action_link', array('href' => RC_Uri::url('groupbuy/admin/init'), 'text' => '团购活动列表'));
+        $page = !empty($_GET['page']) ? intval($_GET['page']) : 1;
+        $action_link = array('href' => RC_Uri::url('groupbuy/admin/init'), 'text' => '团购活动列表');
+        if ($page > 1) {
+        	$action_link = array('href' => RC_Uri::url('groupbuy/admin/init', array('page' => $page)), 'text' => '团购活动列表');
+        }
+        $this->assign('action_link', $action_link);
         ecjia_screen::get_current_screen()->add_nav_here(new admin_nav_here(__('活动详情')));
 
         $act_id = intval($_GET['id']);
