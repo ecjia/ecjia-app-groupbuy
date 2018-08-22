@@ -44,7 +44,7 @@
 //
 //  ---------------------------------------------------------------------------------
 //
-use Ecjia\System\Notifications\GroupbuyActivitySucceed;
+use Ecjia\App\Groupbuy\Notifications\GroupbuyActivitySucceed;
 defined('IN_ECJIA') or exit('No permission resources.');
 
 class merchant extends ecjia_merchant

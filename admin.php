@@ -44,7 +44,7 @@
 //
 //  ---------------------------------------------------------------------------------
 //
-use Ecjia\System\Notifications\GroupbuyActivitySucceed;
+use Ecjia\App\Groupbuy\Notifications\GroupbuyActivitySucceed;
 defined('IN_ECJIA') or exit('No permission resources.');
 
 class admin extends ecjia_admin
