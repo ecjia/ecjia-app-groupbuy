@@ -44,6 +44,7 @@
 //
 //  ---------------------------------------------------------------------------------
 //
+use Ecjia\System\Notifications\GroupbuyActivitySucceed;
 defined('IN_ECJIA') or exit('No permission resources.');
 
 class admin extends ecjia_admin
@@ -506,15 +507,36 @@ class admin extends ecjia_admin
                 ->where(RC_DB::raw('o.extension_id'), $group_buy_id)
                 ->where(RC_DB::raw('o.order_status'), OS_CONFIRMED)
                 ->get();
-
+			
+            $orm_user_db = RC_Model::model('orders/orm_users_model');
+           
             if (!empty($res)) {
                 foreach ($res as $order) {
+                	$store_name = RC_DB::table('store_franchisee')->where('store_id', $order['store_id'])->pluck('merchants_name');
+                	$user_name = RC_DB::table('users')->where('user_id', $order['user_id'])->pluck('user_name');
+                	
                     $options = array(
                         'user_name' => $order['consignee'],
-                        'store_name' => $_SESSION['store_name'],
+                        'store_name' => $store_name,
                         'goods_name' => $order['goods_name']
                     );
                     RC_Api::api('sms', 'sms_groupbuy_activity_succeed', $options);
+                    //消息通知
+                    $user_ob = $orm_user_db->find($order['user_id']);
+                    
+                    $groupbuy_data = array(
+                    		'title'	=> '团购活动成功结束',
+                    		'body'	=> '您在'.$store_name.'店铺参加的商品'.$order['goods_name'].'的团购活动现已结束， 请尽快支付订单剩余余款，方便及时给您发货。',
+                    		'data'	=> array(
+                    				'user_id'				=> $order['user_id'],
+                    				'user_name'				=> $user_name,
+                    				'store_name'			=> $_SESSION['store_name'],
+                    				'goods_name' 			=> $order['goods_name'],
+                    		),
+                    );
+                    	
+                    $push_groupbuy_data = new GroupbuyActivitySucceed($groupbuy_data);
+                    RC_Notification::send($user_ob, $push_groupbuy_data);
                 }
             }
             return $this->showmessage('短信发送成功！', ecjia::MSGTYPE_JSON | ecjia::MSGSTAT_SUCCESS, array('pjaxurl' => $edit_url));
