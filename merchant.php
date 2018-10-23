@@ -76,7 +76,7 @@ class merchant extends ecjia_merchant
         RC_Style::enqueue_style('mh_groupbuy', RC_App::apps_url('statics/css/mh_groupbuy.css', __FILE__), array());
 
         ecjia_merchant_screen::get_current_screen()->add_nav_here(new admin_nav_here(__('团购活动管理'), RC_Uri::url('groupbuy/merchant/init')));
-        ecjia_merchant_screen::get_current_screen()->set_parentage('groupbuy', 'groupbuy/merchant.php');
+        ecjia_merchant_screen::get_current_screen()->set_parentage('promotion', 'promotion/merchant.php');
     }
 
     /**
