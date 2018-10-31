@@ -260,6 +260,14 @@ class merchant extends ecjia_merchant
         $shop_price = RC_DB::table('goods')->where('store_id', $_SESSION['store_id'])->where('goods_id', $group_buy['goods_id'])->pluck('shop_price');
         $this->assign('shop_price', $shop_price);
 
+        $res = RC_DB::table('order_info as o')->leftJoin('order_goods as g', RC_DB::raw('o.order_id'), '=', RC_DB::raw('g.order_id'))
+            ->select(RC_DB::raw('o.consignee, o.user_id, o.mobile, g.goods_name'))
+            ->where(RC_DB::raw('o.extension_code'), 'group_buy')
+            ->where(RC_DB::raw('o.extension_id'), $act_id)
+            ->where(RC_DB::raw('o.order_status'), OS_CONFIRMED)
+            ->get();
+        $this->assign('count_res', count($res));
+
         $this->display('group_buy_info.dwt');
     }
 
