@@ -491,8 +491,6 @@ class admin extends ecjia_admin
             RC_DB::table('goods_activity')->where('act_id', $group_buy_id)->update($data);
 
             return $this->showmessage(RC_Lang::get('groupbuy::groupbuy.edit_success'), ecjia::MSGTYPE_JSON | ecjia::MSGSTAT_SUCCESS, array('pjaxurl' => $edit_url));
-        } elseif ($submitname == 'sms') {
-
         } else {
             $goods_id = intval($_POST['goods_id']);
             $info = $this->goods_group_buy($goods_id);
