@@ -450,7 +450,7 @@ class merchant extends ecjia_merchant
                 return $this->showmessage(RC_Lang::get('groupbuy::groupbuy.error_status'), ecjia::MSGTYPE_JSON | ecjia::MSGSTAT_ERROR);
             }
             $res = RC_DB::table('order_info as o')->leftJoin('order_goods as g', RC_DB::raw('o.order_id'), '=', RC_DB::raw('g.order_id'))
-                ->select(RC_DB::raw('o.consignee, o.user_id, o.mobile, g.goods_name'))
+                ->select(RC_DB::raw('o.consignee, o.user_id, o.mobile, o.order_id, g.goods_name'))
                 ->where(RC_DB::raw('o.extension_code'), 'group_buy')
                 ->where(RC_DB::raw('o.extension_id'), $group_buy_id)
                 ->where(RC_DB::raw('o.order_status'), OS_CONFIRMED)
@@ -486,6 +486,7 @@ class merchant extends ecjia_merchant
             				'user_name'				=> $user_name,
             				'store_name'			=> $_SESSION['store_name'],
             				'goods_name' 			=> $order['goods_name'],
+                			'order_id'				=>  $order['order_id'],
                 		),
                     );
                     $push_groupbuy_data = new GroupbuyActivitySucceed($groupbuy_data);
