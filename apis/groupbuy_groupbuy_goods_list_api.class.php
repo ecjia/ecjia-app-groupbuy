@@ -52,7 +52,7 @@ class groupbuy_groupbuy_goods_list_api extends Component_Event_Api {
 		$page_row = new ecjia_page($count, $size, 6, '', $page);
 		
 		$res = $db_goods_activity
-    		->select(RC_DB::raw('ga.*,g.shop_price, g.market_price, g.goods_brief, g.goods_thumb, g.goods_img, g.original_img'))
+    		->select(RC_DB::raw('ga.*,g.shop_price, g.market_price, g.goods_brief, g.goods_thumb, g.goods_img, g.original_img, g.store_id'))
     		->take($size)->skip($page_row->start_id - 1)->orderBy(RC_DB::raw('ga.act_id'),'desc')
     		->get();
 		
@@ -86,7 +86,8 @@ class groupbuy_groupbuy_goods_list_api extends Component_Event_Api {
 																'url'	=> empty($val['original_img'])? '' : RC_Upload::upload_url($val['original_img'])	
 													    	),
 								'goods_activity_id'		=> $val['act_id'],
-								'activity_type'			=> 'GROUPBUY_GOODS'
+								'activity_type'			=> 'GROUPBUY_GOODS',
+								'manage_mode'			=> $this->get_store_mode($val['store_id'])
 						  );
 			}
 		}
@@ -98,6 +99,17 @@ class groupbuy_groupbuy_goods_list_api extends Component_Event_Api {
 		);
 		
 		return array('list' => $list, 'page' => $pager);
+	}
+	
+	
+	private function get_store_mode($store_id = 0)
+	{
+		$store_mode = '';
+		if (!empty($store_id)) {
+			$store_mode = RC_DB::table('store_franchisee')->where('store_id', $store_id)->plucK('manage_mode');
+		}
+		
+		return $store_mode;
 	}
 }
 
