@@ -475,7 +475,7 @@ class admin extends ecjia_admin
                             $order['surplus'] = 0;
                             $order['money_paid'] = 0;
                             $order['order_amount'] = $money;
-                            // 退款到帐户余额
+                            // 退款到账户余额
                             order_refund($order, 1, RC_Lang::get('groupbuy::groupbuy.cancel_order_reason') . ':' . $order['order_sn'], $money);
                         }
                         /* 更新订单 */
