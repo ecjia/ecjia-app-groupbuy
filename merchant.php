@@ -401,11 +401,25 @@ class merchant extends ecjia_merchant
                             $order['surplus']      = 0;
                             $order['money_paid']   = 0;
                             $order['order_amount'] = $money;
-                            // 退款到帐户余额
+                            // 退款到账户余额
                             order_refund($order, 1, RC_Lang::get('groupbuy::groupbuy.cancel_order_reason') . ':' . $order['order_sn'], $money);
                         }
                         /* 更新订单 */
                         update_order($order['order_id'], $order);
+
+                        $options  = array(
+                            'mobile' => $order['mobile'],
+                            'event'  => 'sms_groupbuy_activity_failed',
+                            'value'  => array(
+                                'user_name'  => $order['consignee'],
+                                'store_name' => $_SESSION['store_name'],
+                                'goods_name' => $order['goods_name']
+                            )
+                        );
+                        $response = RC_Api::api('sms', 'send_event_sms', $options);
+                        if (is_ecjia_error($response)) {
+                            return $this->showmessage($response->get_error_message(), ecjia::MSGTYPE_JSON | ecjia::MSGSTAT_ERROR);
+                        }
                     }
                 }
             }

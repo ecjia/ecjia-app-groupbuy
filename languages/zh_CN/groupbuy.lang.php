@@ -154,7 +154,7 @@ return array(
 		'about_edit_groupbuy'	=> '关于编辑团购帮助文档',
 
 		//退款操作语言包
-		'refund_error_notice'	=> '匿名用户不能返回退款到帐户余额！',
+		'refund_error_notice'	=> '匿名用户不能返回退款到账户余额！',
 		'error_notice'			=> '操作有误！请重新操作！',
 		'order_refund' 			=> '订单退款：%s',
 
