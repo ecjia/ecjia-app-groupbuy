@@ -346,7 +346,7 @@ class merchant extends ecjia_merchant
                             if ($order['order_amount'] < 0) {
                                 // todo （现在手工退款）
                             }
-                            $order['order_status'] = OS_CONFIRMED;
+                            $order['order_status'] = OS_UNCONFIRMED;
                             $order['confirm_time'] = RC_Time::gmtime();
                             update_order($order_id, $order);
                         } else {
