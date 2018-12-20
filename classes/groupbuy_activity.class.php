@@ -65,9 +65,9 @@ class groupbuy_activity {
 		$group_buy_id = intval ( $group_buy_id );
 		$db = RC_DB::table('goods_activity');
 		$group_buy = $db->where('act_id', $group_buy_id)
-						->where('start_time', '<', RC_Time::gmtime())
-						->where('end_time', '>', RC_Time::gmtime())
-						->where('act_type',GAT_GROUP_BUY)
+						->where('start_time', '<=', RC_Time::gmtime())
+						->where('end_time', '>=', RC_Time::gmtime())
+						->where('act_type', GAT_GROUP_BUY)
 						->select(RC_DB::raw('*,act_id as group_buy_id, act_desc as group_buy_desc, start_time as start_date, end_time as end_date'))
 						->first();
 	
