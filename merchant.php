@@ -651,7 +651,19 @@ class merchant extends ecjia_merchant
     public function search_goods()
     {
         $goods_list = array();
-        $row        = RC_Api::api('goods', 'get_goods_list', array('keyword' => $_POST['keyword'], 'store_id' => $_SESSION['store_id'], 'is_on_sale' => 1));
+        $review_status = array(2, 1);
+        //无需审核商家商品
+        $review_goods = ecjia::config('review_goods');
+        if (empty($review_goods)) {
+            $review_status = 2;
+        }
+
+        $row = RC_Api::api('goods', 'get_goods_list', array(
+            'keyword' => $_POST['keyword'],
+            'store_id' => $_SESSION['store_id'],
+            'is_on_sale' => 1,
+            'review_status' => array('neq' => $review_status)
+        ));
         if (!is_ecjia_error($row)) {
             if (!empty($row)) {
                 foreach ($row as $key => $val) {
