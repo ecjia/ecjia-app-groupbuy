@@ -131,20 +131,6 @@
 						    {elseif $group_buy.status eq 2}
 						    <input type="submit" name="succeed" value="{lang key='groupbuy::groupbuy.button_succeed'}" class="btn btn-info all" />
 						    <input type="submit" name="fail" value="{lang key='groupbuy::groupbuy.button_fail'}" class="btn btn-info all" />
-						    
-						    <!-- 成功结束 -->
-						    {elseif $group_buy.status eq 3 && $group_buy.deposit neq 0 && $count_res neq 0}
-						    <input type="submit" name="sms" value="{lang key='groupbuy::groupbuy.button_sms'}" class="btn btn-info all" />&nbsp;
-						    {/if}
-
-                            <div class="help-block">
-                                {if $group_buy.status eq 2}
-                                <span>操作说明：【活动成功】更新订单价格；</span><br/>
-                                <span style="padding-left:70px;">【活动失败】取消订单，保证金退回帐户余额并以短信方式通知用户，失败原因可以写到活动说明中；</span>
-                                {elseif $group_buy.status eq 3 && $group_buy.deposit neq 0 && $count_res neq 0}
-                                <span>操作说明：【发送短信】在设置保证金时，活动成功结束之后发送短信提醒用户支付余款；</span>
-                                {/if}
-                            </div>
 
 						</div>
 					</div>

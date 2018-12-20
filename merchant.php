@@ -293,81 +293,6 @@ class merchant extends ecjia_merchant
             if ($group_buy['status'] != GBS_FINISHED) {
                 return $this->showmessage(RC_Lang::get('groupbuy::groupbuy.error_status'), ecjia::MSGTYPE_JSON | ecjia::MSGSTAT_ERROR);
             }
-            if ($group_buy['total_order'] > 0) {
-
-                $order_id_list = RC_DB::table('order_info')
-                    ->where('extension_code', 'group_buy')
-                    ->where('extension_id', $group_buy_id)
-                    ->whereIn('order_status', array(OS_CONFIRMED, OS_UNCONFIRMED))
-                    ->lists('order_id');
-                $final_price   = $group_buy['trans_price'];
-
-                $data = array(
-                    'goods_price' => $final_price,
-                );
-                RC_DB::table('order_goods')->whereRaw("order_id " . db_create_in($order_id_list))->update($data);
-
-                $res = RC_DB::table('order_goods')->select('order_id', RC_DB::raw('SUM(goods_number * goods_price) AS goods_amount'))->whereRaw("order_id " . db_create_in($order_id_list))->groupBy('order_id')->get();
-
-                if (!empty($res)) {
-                    foreach ($res as $row) {
-                        $order_id     = $row['order_id'];
-                        $goods_amount = floatval($row['goods_amount']);
-
-                        /* 取得订单信息 */
-                        $order = RC_Api::api('orders', 'merchant_order_info', array('order_id' => $order_id, 'order_sn' => ''));
-
-                        /* 判断订单是否有效：余额支付金额 + 已付款金额 >= 保证金 */
-                        if ($order['surplus'] + $order['money_paid'] >= $group_buy['deposit']) {
-                            $order['goods_amount'] = $goods_amount;
-                            if ($order['insure_fee'] > 0) {
-                                $shipping            = ecjia_shipping::getPluginDataById($order['shipping_id']);
-                                $order['insure_fee'] = ecjia_shipping::insureFee($shipping['shipping_code'], $goods_amount, $shipping['insure']);
-                            }
-                            // 重算支付费用
-                            $order['order_amount'] = $order['goods_amount'] + $order['shipping_fee'] + $order['tax']
-                                + $order['insure_fee'] + $order['pack_fee'] + $order['card_fee']
-                                - $order['money_paid'] - $order['surplus'];
-//                             if ($order['order_amount'] > 0) {
-                            $order['pay_fee'] = pay_fee($order['pay_id'], $order['order_amount']);
-//                             } else {
-//                                 $order['pay_fee'] = 0;
-//                             }
-
-                            $order['order_amount'] += $order['pay_fee'];
-                            if ($order['order_amount'] > 0) {
-                                $order['pay_status'] = PS_UNPAYED;
-                                $order['pay_time']   = 0;
-                            } else {
-                                $order['pay_status'] = PS_PAYED;
-                                $order['pay_time']   = RC_Time::gmtime();
-                            }
-
-                            if ($order['order_amount'] < 0) {
-                                // todo （现在手工退款）
-                            }
-                            $order['order_status'] = OS_UNCONFIRMED;
-                            $order['confirm_time'] = RC_Time::gmtime();
-                            update_order($order_id, $order);
-                        } else {
-                            $order['order_status'] = OS_CANCELED;
-                            $order['to_buyer']     = RC_Lang::get('groupbuy::groupbuy.cancel_order_reason');
-                            $order['pay_status']   = PS_UNPAYED;
-                            $order['pay_time']     = 0;
-                            $money                 = $order['surplus'] + $order['money_paid'];
-                            if ($money > 0) {
-                                $order['surplus']      = 0;
-                                $order['money_paid']   = 0;
-                                $order['order_amount'] = $money;
-                                order_refund($order, 1, RC_Lang::get('groupbuy::groupbuy.cancel_order_reason') . ':' . $order['order_sn']);
-                            }
-                            /* 更新订单 */
-                            update_order($order['order_id'], $order);
-                        }
-                    }
-                }
-            }
-
             $data = array(
                 'is_finished' => GBS_SUCCEED,
             );
@@ -380,50 +305,6 @@ class merchant extends ecjia_merchant
             if ($group_buy['status'] != GBS_FINISHED) {
                 return $this->showmessage(RC_Lang::get('groupbuy::groupbuy.error_status'), ecjia::MSGTYPE_JSON | ecjia::MSGSTAT_ERROR);
             }
-            if ($group_buy['valid_order'] > 0) {
-                $res = RC_DB::table('order_info')
-                    ->where('extension_code', 'group_buy')
-                    ->where('extension_id', $group_buy_id)
-                    ->where('order_status', OS_CONFIRMED)
-                    ->orWhere('order_status', OS_UNCONFIRMED)
-                    ->get();
-
-                if (!empty($res)) {
-                    foreach ($res as $order) {
-                        // 修改订单状态为已取消，付款状态为未付款
-                        $order['order_status'] = OS_CANCELED;
-                        $order['to_buyer']     = RC_Lang::get('groupbuy::groupbuy.cancel_order_reason');
-                        $order['pay_status']   = PS_UNPAYED;
-                        $order['pay_time']     = 0;
-                        /* 如果使用余额或有已付款金额，退回帐户余额 */
-                        $money = $order['surplus'] + $order['money_paid'];
-                        if ($money > 0) {
-                            $order['surplus']      = 0;
-                            $order['money_paid']   = 0;
-                            $order['order_amount'] = $money;
-                            // 退款到账户余额
-                            order_refund($order, 1, RC_Lang::get('groupbuy::groupbuy.cancel_order_reason') . ':' . $order['order_sn'], $money);
-                        }
-                        /* 更新订单 */
-                        update_order($order['order_id'], $order);
-
-                        $options  = array(
-                            'mobile' => $order['mobile'],
-                            'event'  => 'sms_groupbuy_activity_failed',
-                            'value'  => array(
-                                'user_name'  => $order['consignee'],
-                                'store_name' => $_SESSION['store_name'],
-                                'goods_name' => $order['goods_name']
-                            )
-                        );
-                        $response = RC_Api::api('sms', 'send_event_sms', $options);
-                        if (is_ecjia_error($response)) {
-                            return $this->showmessage($response->get_error_message(), ecjia::MSGTYPE_JSON | ecjia::MSGSTAT_ERROR);
-                        }
-                    }
-                }
-            }
-
             $data = array(
                 'is_finished' => GBS_FAIL,
                 'act_desc'    => $_POST['act_desc'],
@@ -431,55 +312,6 @@ class merchant extends ecjia_merchant
             RC_DB::table('goods_activity')->where('store_id', $_SESSION['store_id'])->where('act_id', $group_buy_id)->update($data);
 
             return $this->showmessage(RC_Lang::get('groupbuy::groupbuy.edit_success'), ecjia::MSGTYPE_JSON | ecjia::MSGSTAT_SUCCESS, array('pjaxurl' => $edit_url));
-        } elseif ($submitname == 'sms') {
-            if ($group_buy['status'] != GBS_SUCCEED) {
-                return $this->showmessage(RC_Lang::get('groupbuy::groupbuy.error_status'), ecjia::MSGTYPE_JSON | ecjia::MSGSTAT_ERROR);
-            }
-            $res = RC_DB::table('order_info as o')->leftJoin('order_goods as g', RC_DB::raw('o.order_id'), '=', RC_DB::raw('g.order_id'))
-                ->select(RC_DB::raw('o.consignee, o.user_id, o.mobile, o.order_id, g.goods_name'))
-                ->where(RC_DB::raw('o.extension_code'), 'group_buy')
-                ->where(RC_DB::raw('o.extension_id'), $group_buy_id)
-                ->where(RC_DB::raw('o.order_status'), OS_CONFIRMED)
-                ->get();
-
-            $orm_user_db = RC_Model::model('orders/orm_users_model');
-
-            if (!empty($res)) {
-                foreach ($res as $order) {
-                    $options  = array(
-                        'mobile' => $order['mobile'],
-                        'event'  => 'sms_groupbuy_activity_succeed',
-                        'value'  => array(
-                            'user_name'  => $order['consignee'],
-                            'store_name' => $_SESSION['store_name'],
-                            'goods_name' => $order['goods_name']
-                        )
-                    );
-                    $response = RC_Api::api('sms', 'send_event_sms', $options);
-                    if (is_ecjia_error($response)) {
-                        return $this->showmessage($response->get_error_message(), ecjia::MSGTYPE_JSON | ecjia::MSGSTAT_ERROR);
-                    }
-
-                    //消息通知
-                    $user_name = RC_DB::table('users')->where('user_id', $order['user_id'])->pluck('user_name');
-                    $user_ob   = $orm_user_db->find($order['user_id']);
-
-                    $groupbuy_data      = array(
-                        'title' => '团购活动成功结束',
-                        'body'  => '您在' . $_SESSION['store_name'] . '店铺参加的商品' . $order['goods_name'] . '的团购活动现已结束， 请尽快支付订单剩余余款，方便及时给您发货。',
-                        'data'  => array(
-                            'user_id'    => $order['user_id'],
-                            'user_name'  => $user_name,
-                            'store_name' => $_SESSION['store_name'],
-                            'goods_name' => $order['goods_name'],
-                            'order_id'   => $order['order_id'],
-                        ),
-                    );
-                    $push_groupbuy_data = new GroupbuyActivitySucceed($groupbuy_data);
-                    RC_Notification::send($user_ob, $push_groupbuy_data);
-                }
-                return $this->showmessage('短信发送成功！', ecjia::MSGTYPE_JSON | ecjia::MSGSTAT_SUCCESS, array('pjaxurl' => $edit_url));
-            }
         } else {
             $group_buy = $this->group_buy_info($group_buy_id);
 
