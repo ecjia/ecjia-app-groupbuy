@@ -495,78 +495,100 @@ class merchant extends ecjia_merchant
                 return $this->showmessage('短信发送成功！', ecjia::MSGTYPE_JSON | ecjia::MSGSTAT_SUCCESS, array('pjaxurl' => $edit_url));
             }
         } else {
-            $goods_id = intval($_POST['goods_id']);
-
-            $info = $this->goods_group_buy($goods_id);
-            if ($info && $info['act_id'] != $group_buy_id) {
-                return $this->showmessage('您选择的商品目前有一个团购活动正在进行,请选择其他商品！', ecjia::MSGTYPE_JSON | ecjia::MSGSTAT_ERROR);
-            }
-
-            RC_Loader::load_app_func('admin_goods', 'goods');
-            $properties = get_goods_properties($goods_id);
-            if (isset($properties['spe']) && !empty($properties['spe'])) {
-                return $this->showmessage('商品有属性价格时，不可添加为团购商品！', ecjia::MSGTYPE_JSON | ecjia::MSGSTAT_ERROR);
-            }
-
-            $goods_name = RC_DB::table('goods')->where('store_id', $_SESSION['store_id'])->where('goods_id', $goods_id)->pluck('goods_name');
-            $act_name = $goods_name;
+            $group_buy = $this->group_buy_info($group_buy_id);
 
             $act_desc = !empty($_POST['act_desc']) ? trim($_POST['act_desc']) : '';
-            $price_ladder = !empty($_POST['price_ladder']) ? $_POST['price_ladder'] : '';
-            $restrict_amount = !empty($_POST['restrict_amount']) ? $_POST['restrict_amount'] : '';
-            $gift_integral = !empty($_POST['gift_integral']) ? $_POST['gift_integral'] : 0;
-            $deposit = (!empty($_POST['deposit']) && floatval($_POST['deposit']) > 0) ? floatval($_POST['deposit']) : 0;
-
-            $price_ladder = array();
-            $count = count($_POST['ladder_amount']);
-            for ($i = $count - 1; $i >= 0; $i--) {
-                $amount = intval($_POST['ladder_amount'][$i]);
-                if ($amount <= 0) {
-                    continue;
-                }
-                $price = round(floatval($_POST['ladder_price'][$i]), 2);
-                if ($price < $deposit) {
-                    return $this->showmessage('阶梯价格不能小于保证金金额！', ecjia::MSGTYPE_JSON | ecjia::MSGSTAT_ERROR);
-                }
-                if ($price <= 0) {
-                    continue;
-                }
-                $price_ladder[$amount] = array('amount' => $amount, 'price' => $price);
-            }
-
-            if (count($price_ladder) < 1) {
-                return $this->showmessage('请输入有效的价格阶梯！', ecjia::MSGTYPE_JSON | ecjia::MSGSTAT_ERROR);
-            }
-
-            $amount_list = array_keys($price_ladder);
-            if ($restrict_amount > 0 && max($amount_list) > $restrict_amount) {
-                return $this->showmessage('限购数量不能小于价格阶梯中的最大数量！', ecjia::MSGTYPE_JSON | ecjia::MSGSTAT_ERROR);
-            }
-            ksort($price_ladder);
-            $price_ladder = array_values($price_ladder);
 
             $start_time = !empty($_POST['start_time']) ? RC_Time::local_strtotime($_POST['start_time']) : '';
             $end_time = !empty($_POST['end_time']) ? RC_Time::local_strtotime($_POST['end_time']) : '';
 
-            if ($start_time >= $end_time) {
-                return $this->showmessage('请输入一个有效的团购时间！', ecjia::MSGTYPE_JSON | ecjia::MSGSTAT_ERROR);
-            }
+            //活动未开始 所有都可修改
+            if (empty($group_buy['status'])) {
+                $goods_id = intval($_POST['goods_id']);
+                $info = $this->goods_group_buy($goods_id);
+                if ($info && $info['act_id'] != $group_buy_id) {
+                    return $this->showmessage('您选择的商品目前有一个团购活动正在进行,请选择其他商品！', ecjia::MSGTYPE_JSON | ecjia::MSGSTAT_ERROR);
+                }
 
-            $data = array(
-                'act_name' => $act_name,
-                'act_desc' => $act_desc,
-                'act_type' => GAT_GROUP_BUY,
-                'goods_id' => $goods_id,
-                'goods_name' => $goods_name,
-                'start_time' => $start_time,
-                'end_time' => $end_time,
-                'ext_info' => serialize(array(
-                    'price_ladder' => $price_ladder,
-                    'restrict_amount' => $restrict_amount,
-                    'gift_integral' => $gift_integral,
-                    'deposit' => $deposit,
-                )),
-            );
+                RC_Loader::load_app_func('admin_goods', 'goods');
+                $properties = get_goods_properties($goods_id);
+                if (isset($properties['spe']) && !empty($properties['spe'])) {
+                    return $this->showmessage('商品有属性价格时，不可添加为团购商品！', ecjia::MSGTYPE_JSON | ecjia::MSGSTAT_ERROR);
+                }
+
+                $goods_name = RC_DB::table('goods')->where('store_id', $_SESSION['store_id'])->where('goods_id', $goods_id)->pluck('goods_name');
+                $act_name = $goods_name;
+
+                $price_ladder = !empty($_POST['price_ladder']) ? $_POST['price_ladder'] : '';
+                $restrict_amount = !empty($_POST['restrict_amount']) ? $_POST['restrict_amount'] : '';
+                $gift_integral = !empty($_POST['gift_integral']) ? $_POST['gift_integral'] : 0;
+                $deposit = (!empty($_POST['deposit']) && floatval($_POST['deposit']) > 0) ? floatval($_POST['deposit']) : 0;
+
+                $price_ladder = array();
+                $count = count($_POST['ladder_amount']);
+                for ($i = $count - 1; $i >= 0; $i--) {
+                    $amount = intval($_POST['ladder_amount'][$i]);
+                    if ($amount <= 0) {
+                        continue;
+                    }
+                    $price = round(floatval($_POST['ladder_price'][$i]), 2);
+                    if ($price < $deposit) {
+                        return $this->showmessage('阶梯价格不能小于保证金金额！', ecjia::MSGTYPE_JSON | ecjia::MSGSTAT_ERROR);
+                    }
+                    if ($price <= 0) {
+                        continue;
+                    }
+                    $price_ladder[$amount] = array('amount' => $amount, 'price' => $price);
+                }
+
+                if (count($price_ladder) < 1) {
+                    return $this->showmessage('请输入有效的价格阶梯！', ecjia::MSGTYPE_JSON | ecjia::MSGSTAT_ERROR);
+                }
+
+                $amount_list = array_keys($price_ladder);
+                if ($restrict_amount > 0 && max($amount_list) > $restrict_amount) {
+                    return $this->showmessage('限购数量不能小于价格阶梯中的最大数量！', ecjia::MSGTYPE_JSON | ecjia::MSGSTAT_ERROR);
+                }
+                ksort($price_ladder);
+                $price_ladder = array_values($price_ladder);
+
+                if ($start_time >= $end_time) {
+                    return $this->showmessage('请输入一个有效的团购时间！', ecjia::MSGTYPE_JSON | ecjia::MSGSTAT_ERROR);
+                }
+
+                $data = array(
+                    'act_name' => $act_name,
+                    'act_desc' => $act_desc,
+                    'act_type' => GAT_GROUP_BUY,
+                    'goods_id' => $goods_id,
+                    'goods_name' => $goods_name,
+                    'start_time' => $start_time,
+                    'end_time' => $end_time,
+                    'ext_info' => serialize(array(
+                        'price_ladder' => $price_ladder,
+                        'restrict_amount' => $restrict_amount,
+                        'gift_integral' => $gift_integral,
+                        'deposit' => $deposit,
+                    )),
+                );
+
+                //活动进行中 可修改活动描述和活动结束时间
+            } elseif ($group_buy['status'] == GBS_UNDER_WAY) {
+                $start_time = $group_buy['start_date'];
+                if ($start_time >= $end_time) {
+                    return $this->showmessage('请输入一个有效的团购时间！', ecjia::MSGTYPE_JSON | ecjia::MSGSTAT_ERROR);
+                }
+                $data = array(
+                    'act_desc' => $act_desc,
+                    'end_time' => $end_time
+                );
+
+                //活动已结束 只可修改活动描述
+            } elseif ($group_buy['status'] == GBS_FINISHED) {
+                $data = array(
+                    'act_desc' => $act_desc
+                );
+            }
             RC_DB::table('goods_activity')->where('store_id', $_SESSION['store_id'])->where('act_id', $group_buy_id)->update($data);
 
             ecjia_merchant::admin_log($goods_name, 'edit', 'group_buy');
