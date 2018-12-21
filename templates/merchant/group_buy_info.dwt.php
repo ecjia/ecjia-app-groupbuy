@@ -128,10 +128,10 @@
 						    <input type="submit" name="finish" value="{lang key='groupbuy::groupbuy.button_finish'}" class="btn btn-info all" />&nbsp;
 						    
 						    <!-- 结束未处理 -->
-						    {elseif $group_buy.status eq 2}
+						    {else if $group_buy.status eq 2}
 						    <input type="submit" name="succeed" value="{lang key='groupbuy::groupbuy.button_succeed'}" class="btn btn-info all" />
 						    <input type="submit" name="fail" value="{lang key='groupbuy::groupbuy.button_fail'}" class="btn btn-info all" />
-
+							{/if}
 						</div>
 					</div>
 				</div>
