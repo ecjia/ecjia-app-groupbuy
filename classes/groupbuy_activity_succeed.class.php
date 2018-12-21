@@ -119,6 +119,16 @@ class groupbuy_activity_succeed
                                 $order['order_status'] = OS_UNCONFIRMED;
                                 $order['confirm_time'] = RC_Time::gmtime();
                                 update_order($order_id, $order);
+
+                                //多余支付退款
+                                if (!empty($group_buy['deposit'])) {
+                                    $money = $order['surplus'] + $order['money_paid'];
+                                    if ($money > $final_price) {
+                                        $refund_amount = $money - $final_price;
+                                        order_refund($order, 2, '团购订单多余支付金额退回' . ':' . $order['order_sn'], $refund_amount);
+                                    }
+                                }
+
                             } else {
                                 $order['order_status'] = OS_CANCELED;
                                 $order['to_buyer']     = RC_Lang::get('groupbuy::groupbuy.cancel_order_reason');
