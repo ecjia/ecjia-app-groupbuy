@@ -51,6 +51,7 @@
 						<div class="col-lg-6">
 							<input class="form-control" type="text" name="deposit" id="deposit" value="{$group_buy.deposit|default:0}" {if $group_buy.status neq 0}disabled{/if}/>
 						</div>
+                        <span class="input-must">*</span>
 					</div>
 				
 					<div class="form-group" >
@@ -128,10 +129,10 @@
 						    <input type="submit" name="finish" value="{lang key='groupbuy::groupbuy.button_finish'}" class="btn btn-info all" />&nbsp;
 						    
 						    <!-- 结束未处理 -->
-						    {else if $group_buy.status eq 2}
+						    {elseif $group_buy.status eq 2}
 						    <input type="submit" name="succeed" value="{lang key='groupbuy::groupbuy.button_succeed'}" class="btn btn-info all" />
 						    <input type="submit" name="fail" value="{lang key='groupbuy::groupbuy.button_fail'}" class="btn btn-info all" />
-							{/if}
+                            {/if}
 						</div>
 					</div>
 				</div>

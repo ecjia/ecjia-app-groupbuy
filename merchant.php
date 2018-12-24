@@ -159,6 +159,10 @@ class merchant extends ecjia_merchant
         $gift_integral   = !empty($_POST['gift_integral']) ? $_POST['gift_integral'] : 0;
         $deposit         = (!empty($_POST['deposit']) && floatval($_POST['deposit']) > 0) ? floatval($_POST['deposit']) : 0;
 
+        if (empty($deposit)) {
+            return $this->showmessage('保证金不能为0', ecjia::MSGTYPE_JSON | ecjia::MSGSTAT_ERROR);
+        }
+
         $price_ladder = array();
         $count        = count($_POST['ladder_amount']);
         for ($i = $count - 1; $i >= 0; $i--) {
@@ -343,6 +347,10 @@ class merchant extends ecjia_merchant
                 $gift_integral = !empty($_POST['gift_integral']) ? $_POST['gift_integral'] : 0;
                 $deposit       = (!empty($_POST['deposit']) && floatval($_POST['deposit']) > 0) ? floatval($_POST['deposit']) : 0;
 
+                if (empty($deposit)) {
+                    return $this->showmessage('保证金不能为0', ecjia::MSGTYPE_JSON | ecjia::MSGSTAT_ERROR);
+                }
+                
                 $price_ladder = array();
                 $count        = count($_POST['ladder_amount']);
                 for ($i = $count - 1; $i >= 0; $i--) {
