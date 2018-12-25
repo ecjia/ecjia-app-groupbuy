@@ -24,7 +24,7 @@
 	  	<div class="col-lg-12">
 	      	<section class="panel">
 	      		<div class="panel-body">
-                    {if $group_buy}
+                    {if $group_buy.act_id}
                     <div class="form-group">
                         <label class="control-label col-lg-2">团购状态：</label>
                         <div class="col-lg-6 l_h30">
