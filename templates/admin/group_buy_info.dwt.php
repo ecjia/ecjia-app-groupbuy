@@ -22,6 +22,27 @@
 	<div class="span12">
 		<form class="form-horizontal" action="{$form_action}" method="post" enctype="multipart/form-data" name="theForm">
 			<fieldset>
+                {if $group_buy}
+                <div class="control-group formSep">
+                    <label class="control-label">{t}活动商品：{/t}</label>
+                    <div class="controls l_h30">
+                        <span class="groupbuy-status groupbuy-status-{$group_buy.status}">
+                            {if $group_buy.status eq 0}
+                            活动未开始
+                            {else if $group_buy.status eq 1}
+                            活动进行中
+                            {else if $group_buy.status eq 2}
+                            结束未处理
+                            {else if $group_buy.status eq 3}
+                            成功结束
+                            {else if $group_buy.status eq 4}
+                            失败结束
+                            {/if}
+                        </span>
+                    </div>
+                </div>
+                {/if}
+
 				<div class="control-group formSep">
 					<label class="control-label">{t}活动商品：{/t}</label>
 					<div class="controls">

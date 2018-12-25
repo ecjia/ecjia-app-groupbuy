@@ -24,14 +24,35 @@
 	  	<div class="col-lg-12">
 	      	<section class="panel">
 	      		<div class="panel-body">
-					<div class="form-group">
+                    {if $group_buy}
+                    <div class="form-group">
+                        <label class="control-label col-lg-2">团购状态：</label>
+                        <div class="col-lg-6 l_h30">
+                            <span class="groupbuy-status groupbuy-status-{$group_buy.status}">
+                                {if $group_buy.status eq 0}
+                                活动未开始
+                                {else if $group_buy.status eq 1}
+                                活动进行中
+                                {else if $group_buy.status eq 2}
+                                结束未处理
+                                {else if $group_buy.status eq 3}
+                                成功结束
+                                {else if $group_buy.status eq 4}
+                                失败结束
+                                {/if}
+                            </span>
+                        </div>
+                    </div>
+                    {/if}
+
+                    <div class="form-group">
                           <label class="control-label col-lg-2">商品关键字：</label>
                            <div class="col-lg-6">
                               <input class="form-control" type="text" name="keywords" {if $group_buy.status neq 0}disabled{/if}/>
                           </div>
                            <button class="btn btn-primary searchGoods" data-url='{url path="/merchant/search_goods"}' type="button" {if $group_buy.status neq 0}disabled{/if}><i class='fa fa-search'></i> 搜索</button>
-               		</div> 
-               		
+               		</div>
+
 					<div class="form-group">
 						<label class="control-label col-lg-2">{t}选择活动商品：{/t}</label>
 						<div class="col-lg-6">
@@ -41,11 +62,11 @@
 						      <!-- {else} -->
 						     <option value="{$group_buy.goods_id}">{$group_buy.goods_name}</option>
 						      <!-- {/if} -->
-						    </select>   
+						    </select>
 						</div>
 						<span class="input-must">*</span>
 					</div>
-							
+
 					<div class="form-group" >
 						<label class="control-label col-lg-2">{t}保证金：{/t}</label>
 						<div class="col-lg-6">
@@ -54,7 +75,7 @@
 						</div>
                         <span class="input-must">*</span>
 					</div>
-				
+
 					<div class="form-group" >
 						<label class="control-label col-lg-2">{t}限购数量：{/t}</label>
 						<div class="col-lg-6">
@@ -62,7 +83,7 @@
 							<span class="help-block">{t}达到此数量，团购活动自动结束。0表示没有数量限制。{/t}</span>
 						</div>
 					</div>
-					
+
 					<div class="form-group">
 						<label class="control-label col-lg-2">{t}活动开始时间：{/t}</label>
 						<div class="col-lg-6">
@@ -70,7 +91,7 @@
 						</div>
 						<span class="input-must">*</span>
 					</div>
-						
+
 					<div class="form-group">
 						<label class="control-label col-lg-2">{t}活动结束时间：{/t}</label>
 						<div class="col-lg-6">
@@ -78,12 +99,12 @@
 						</div>
 						<span class="input-must">*</span>
 					</div>
-					
+
 					<div class="form-group" >
 						<label class="control-label col-lg-2">{t}本店售价：{/t}</label>
 						<div class="col-lg-6 l_h30" id="shop_price">{if $shop_price}{$shop_price}{else}0{/if}</div>
 					</div>
-								
+
 					<div class="form-group">
 						<label class="control-label col-lg-2">{t}价格阶梯：{/t}</label>
 						<div class="col-lg-6">
@@ -110,14 +131,14 @@
 						</div>
 						<span class="input-must">*</span>
 					</div>
-					
+
 					<div class="form-group">
 						<label class="control-label col-lg-2">活动说明：</label>
 						<div class="col-lg-6">
 							<textarea class="form-control" name="act_desc" rows="6" cols="40">{$group_buy.act_desc}</textarea>
 						</div>
 					</div>
-								
+
 					<div class="form-group">
 						<div class="col-lg-offset-2 col-lg-10">
 							<input name="act_id" type="hidden" id="act_id" value="{$group_buy.act_id}">
@@ -128,7 +149,7 @@
 						   	<!-- 进行中 -->
 						    {if $group_buy.status eq 1}
 						    <input type="submit" name="finish" value="{lang key='groupbuy::groupbuy.button_finish'}" class="btn btn-info all" />&nbsp;
-						    
+
 						    <!-- 结束未处理 -->
 						    {elseif $group_buy.status eq 2}
 						    <input type="submit" name="succeed" value="{lang key='groupbuy::groupbuy.button_succeed'}" class="btn btn-info all" />
