@@ -49,7 +49,8 @@
 					<div class="form-group" >
 						<label class="control-label col-lg-2">{t}保证金：{/t}</label>
 						<div class="col-lg-6">
-							<input class="form-control" type="text" name="deposit" id="deposit" value="{$group_buy.deposit|default:0}" {if $group_buy.status neq 0}disabled{/if}/>
+							<input class="form-control" type="text" name="deposit" id="deposit" value="{$group_buy.deposit|default:0}" {if $group_buy.status neq 0}disabled{/if} />
+                            <span class="help-block">{t}买家参与该团购活动时，需要预先支付的金额。{/t}</span>
 						</div>
                         <span class="input-must">*</span>
 					</div>
@@ -105,7 +106,7 @@
 								</div>
 							  	<!-- {/if} -->
 						  	<!-- {/foreach} -->
-                            <div class="help-block">价格阶梯的数量指个人消费满多少可享受价格优惠。</div>
+                            <div class="help-block">价格阶梯的数量指以全部用户团购的最终购买数的价格为准。</div>
 						</div>
 						<span class="input-must">*</span>
 					</div>
