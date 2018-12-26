@@ -46,6 +46,8 @@
 //
 defined('IN_ECJIA') or exit('No permission resources.');
 
+use Ecjia\App\Groupbuy\Notifications\GroupbuyActivitySucceed;
+
 /**
  * 团购活动失败
  */
@@ -60,13 +62,13 @@ class groupbuy_activity_failed
             RC_Loader::load_app_func('admin_order', 'orders');
 
             foreach ($act_id_list as $k => $v) {
-                $group_buy  = self::group_buy_info($v['act_id']);
+                $group_buy  = self::group_buy_info($v);
                 $store_name = RC_DB::table('store_franchisee')->where('store_id', $group_buy['store_id'])->pluck('merchants_name');
 
                 if ($group_buy['valid_order'] > 0) {
                     $res = RC_DB::table('order_info')
                         ->where('extension_code', 'group_buy')
-                        ->where('extension_id', $v['act_id'])
+                        ->where('extension_id', $v)
                         ->where('order_status', OS_CONFIRMED)
                         ->orWhere('order_status', OS_UNCONFIRMED)
                         ->get();
