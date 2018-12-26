@@ -60,7 +60,7 @@ class groupbuy_activity_succeed
             RC_Loader::load_app_func('admin_order', 'orders');
 
             foreach ($act_id_list as $k => $v) {
-                $group_buy  = $this->group_buy_info($v['act_id']);
+                $group_buy  = self::group_buy_info($v['act_id']);
                 $store_name = RC_DB::table('store_franchisee')->where('store_id', $group_buy['store_id'])->pluck('merchants_name');
 
                 if ($group_buy['total_order'] > 0) {
@@ -220,7 +220,7 @@ class groupbuy_activity_succeed
         $group_buy['price_ladder'] = $price_ladder;
 
         /* 统计信息 */
-        $stat      = $this->group_buy_stat($group_buy_id, $group_buy['deposit']);
+        $stat      = self::group_buy_stat($group_buy_id, $group_buy['deposit']);
         $group_buy = array_merge($group_buy, $stat);
 
         /* 计算当前价 */
@@ -242,7 +242,7 @@ class groupbuy_activity_succeed
         $group_buy['trans_amount']         = $group_buy['valid_goods'];
 
         /* 状态 */
-        $group_buy['status'] = $this->group_buy_status($group_buy);
+        $group_buy['status'] = self::group_buy_status($group_buy);
 
         if (RC_Lang::get('goods::goods.gbs.' . $group_buy['status'])) {
             $group_buy['status_desc'] = RC_Lang::get('goods::goods.gbs.' . $group_buy['status']);
