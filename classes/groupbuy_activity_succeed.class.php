@@ -69,7 +69,8 @@ class groupbuy_activity_succeed
                     $order_id_list = RC_DB::table('order_info')
                         ->where('extension_code', 'group_buy')
                         ->where('extension_id', $v)
-                        ->whereIn('order_status', array(OS_CONFIRMED, OS_UNCONFIRMED))
+                        ->where('order_status', OS_UNCONFIRMED)
+                        ->where('order_status', '!=', OS_CANCELED)
                         ->lists('order_id');
 
                     $final_price = $group_buy['trans_price'];
@@ -108,7 +109,6 @@ class groupbuy_activity_succeed
                                     - $order['money_paid'] - $order['surplus'];
                                 $order['pay_fee']      = pay_fee($order['pay_id'], $order['order_amount']);
 
-
                                 $order['order_amount'] += $order['pay_fee'];
                                 if ($order['order_amount'] > 0) {
                                     $order['pay_status'] = PS_UNPAYED;
@@ -118,7 +118,7 @@ class groupbuy_activity_succeed
                                     $order['pay_time']   = RC_Time::gmtime();
                                 }
 
-                                $order['order_status'] = OS_UNCONFIRMED;
+                                $order['order_status'] = OS_CONFIRMED;
                                 $order['confirm_time'] = RC_Time::gmtime();
 
                                 update_order($order_id, $order);
