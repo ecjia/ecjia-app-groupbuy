@@ -69,8 +69,8 @@ class groupbuy_activity_failed
                     $res = RC_DB::table('order_info')
                         ->where('extension_code', 'group_buy')
                         ->where('extension_id', $v)
-                        ->where('order_status', OS_CONFIRMED)
-                        ->orWhere('order_status', OS_UNCONFIRMED)
+                        ->whereIn('order_status', array(OS_CONFIRMED, OS_UNCONFIRMED))
+                        ->Where('order_status', '!=', OS_CANCELED)
                         ->get();
 
                     $orm_user_db = RC_Model::model('orders/orm_users_model');
