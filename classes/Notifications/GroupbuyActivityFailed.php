@@ -44,87 +44,69 @@
 //
 //  ---------------------------------------------------------------------------------
 //
-namespace Ecjia\App\Groupbuy;
+namespace Ecjia\App\Groupbuy\Notifications;
 
-use Ecjia\App\Groupbuy\Notifications\GroupbuyActivityFailed as GroupbuyActivityFailedNotifications;
-
-use RC_DB;
-use RC_Notification;
-use RC_Time;
-use RC_Api;
-use RC_Lang;
-use RC_Model;
-
+use Royalcms\Component\Bus\Queueable;
+use Royalcms\Component\Notifications\Notification;
+// use Royalcms\Component\Notifications\Messages\MailMessage;
 
 /**
- * 团购活动成功
+ * 通知用户支付有保证金团购订单的余款
  */
-class GroupbuyActivityFailed extends GroupbuyActivitySucceed
+class GroupbuyActivityFailed extends Notification
 {
-
+    use Queueable;
+    
+	private $notifiable_data;
     /**
-     * 处理付款订单
-     * @param $order
+     * Create a new notification instance.
+     *
+     * @return void
      */
-    protected function processPayedOrders($order)
+    public function __construct($groupbuy_data)
     {
-        //发起退款请求，生成退款订单，打款记录
-
-    }
-
-    /**
-     * 发送短信消息通知
-     */
-    protected function sendSmsMessageNotice($order)
-    {
-        $store_name = $this->getStoreName($order['store_id']);
-        $options    = array(
-            'mobile' => $order['mobile'],
-            'event'  => 'sms_groupbuy_activity_succeed',
-            'value'  => array(
-                'user_name'  => $order['consignee'],
-                'store_name' => $store_name,
-                'goods_name' => $order['goods_name']
-            )
-        );
-        $response   = RC_Api::api('sms', 'send_event_sms', $options);
+        //
+        $this->notifiable_data = $groupbuy_data;
     }
 
     /**
-     * 发送数据库消息通知
+     * Get the notification's delivery channels.
+     *
+     * @param  mixed  $notifiable
+     * @return array
      */
-    protected function sendDatabaseMessageNotice($order)
+    public function via($notifiable)
     {
-        $store_name = $this->getStoreName($order['store_id']);
-
-        //消息通知
-        $user_name = RC_DB::table('users')->where('user_id', $order['user_id'])->pluck('user_name');
-
-        $orm_user_db = RC_Model::model('orders/orm_users_model');
-        $user_ob     = $orm_user_db->find($order['user_id']);
-
-        $groupbuy_data      = array(
-            'title' => '团购活动成功结束',
-            'body'  => '您在' . $store_name . '店铺参加的商品' . $order['goods_name'] . '的团购活动现已结束， 请尽快支付订单剩余余款，方便及时给您发货。',
-            'data'  => array(
-                'user_id'    => $order['user_id'],
-                'user_name'  => $user_name,
-                'store_name' => $store_name,
-                'goods_name' => $order['goods_name'],
-                'order_id'   => $order['order_id'],
-            ),
-        );
-        $push_groupbuy_data = new GroupbuyActivityFailedNotifications($groupbuy_data);
-        RC_Notification::send($user_ob, $push_groupbuy_data);
+        return array('database');
     }
 
-    protected function processGroupBuyAcitivityComplete($act_id)
-    {
-        RC_DB::table('goods_activity')
-            ->where('store_id', '>', 0)
-            ->wher('act_id', $act_id)
-            ->update(array('is_finished' => GBS_FAIL_COMPLETE));
-    }
+//     /**
+//      * Get the mail representation of the notification.
+//      *
+//      * @param  mixed  $notifiable
+//      * @return \Royalcms\Component\Notifications\Messages\MailMessage
+//      */
+//     public function toMail($notifiable)
+//     {
+//         return with(new MailMessage)
+//                     ->line('The introduction to the notification.')
+//                     ->action('Notification Action', 'https://ecjia.com')
+//                     ->line('Thank you for using our application!');
+//     }
 
+    /**
+     * Get the array representation of the notification.
+     *
+     * @param  mixed  $notifiable
+     * @return array
+     */
+    public function toArray()
+    {
+//         return array(
+//         	'user_name' => 'admin',
+//             'order_sn' => '12344421111233332',
+//             'goods_name' => 'test',
+//         );
+        return $this->notifiable_data;
+    }
 }
-// end

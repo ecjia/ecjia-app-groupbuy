@@ -54,13 +54,30 @@ use RC_Time;
 use RC_Api;
 use RC_Lang;
 use RC_Model;
+use ecjia_error;
 
 /**
  * 团购活动成功
  */
 class GroupbuyActivitySucceed
 {
-    public function cronjob()
+
+    public function runCronJob()
+    {
+        $result = $this->cronJob();
+
+        if (is_ecjia_error($result)) {
+            if ($result->get_error_code() == 'groupbuy_orderlist_empty') {
+                $this->cronJob();
+
+                return true;
+            }
+        }
+
+        return $result;
+    }
+
+    protected function cronJob()
     {
         //先获取一个已经结束的团购活动，只能一个一个团购活动处理，不能一次性处理太多，防止失败
         $activity_info = $this->getFirstGroupBuyActivitySucceed();
@@ -73,7 +90,9 @@ class GroupbuyActivitySucceed
         $orders_list = $this->getGroupBuyOrders($activity_info['act_id']);
 
         if (empty($orders_list)) {
-            return true;
+            $this->processGroupBuyAcitivityComplete($activity_info['act_id']);
+
+            return new ecjia_error('groupbuy_orderlist_empty', '团购订单为空');
         }
 
         //遍历执行订单确认任务
@@ -81,6 +100,8 @@ class GroupbuyActivitySucceed
             //处理订单成功逻辑
             $this->processSingleOrder($order, $activity_info);
         });
+
+        return true;
 
     }
 
@@ -130,16 +151,11 @@ class GroupbuyActivitySucceed
          */
         /* 判断订单是否有效：余额支付金额 + 已付款金额 >= 保证金 */
         if ($order['surplus'] + $order['money_paid'] >= $group_buy['deposit']) {
-
             //处理付款订单
             $this->processPayedOrders($order);
-
-
         } else {
-
             $this->closeUnpayOrders($order);
         }
-
 
         $this->sendSmsMessageNotice($order);
 
@@ -257,6 +273,14 @@ class GroupbuyActivitySucceed
     {
         $store_name = RC_DB::table('store_franchisee')->where('store_id', $store_id)->pluck('merchants_name');;
         return $store_name;
+    }
+
+    protected function processGroupBuyAcitivityComplete($act_id)
+    {
+        RC_DB::table('goods_activity')
+            ->where('store_id', '>', 0)
+            ->wher('act_id', $act_id)
+            ->update(array('is_finished' => GBS_SUCCEED_COMPLETE));
     }
 
     /**
