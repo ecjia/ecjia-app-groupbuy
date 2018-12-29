@@ -54,6 +54,8 @@ use RC_Time;
 use RC_Api;
 use RC_Lang;
 use RC_Model;
+use ecjia_error;
+use RC_Loader;
 
 
 /**

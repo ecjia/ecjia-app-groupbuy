@@ -55,6 +55,7 @@ use RC_Api;
 use RC_Lang;
 use RC_Model;
 use ecjia_error;
+use RC_Loader;
 
 /**
  * 团购活动成功
@@ -170,6 +171,8 @@ class GroupbuyActivitySucceed
      */
     protected function processPayedOrders($order)
     {
+        RC_Loader::load_app_func('admin_order', 'orders');
+
         $order['goods_amount'] = floatval($order['goods_amount']);
         if ($order['insure_fee'] > 0) {
             $shipping            = ecjia_shipping::getPluginDataById($order['shipping_id']);
@@ -182,16 +185,21 @@ class GroupbuyActivitySucceed
         $order['pay_fee']      = pay_fee($order['pay_id'], $order['order_amount']);
 
         $order['order_amount'] += $order['pay_fee'];
-        if ($order['order_amount'] > 0) {
-            $order['pay_status'] = PS_UNPAYED;
-            $order['pay_time']   = 0;
-        } else {
-            $order['pay_status'] = PS_PAYED;
-            $order['pay_time']   = RC_Time::gmtime();
-        }
+//        if ($order['order_amount'] > 0) {
+//            $order['pay_status'] = PS_UNPAYED;
+//            $order['pay_time']   = 0;
+//        } else {
+//            $order['pay_status'] = PS_PAYED;
+//            $order['pay_time']   = RC_Time::gmtime();
+//        }
+
+        $order['pay_status'] = PS_UNPAYED;
+        $order['pay_time']   = 0;
 
         $order['order_status'] = OS_CONFIRMED;
         $order['confirm_time'] = RC_Time::gmtime();
+
+        $order['to_buyer']     = '团购活动成功结束';
 
         update_order($order['order_id'], $order);
 
@@ -205,7 +213,7 @@ class GroupbuyActivitySucceed
     protected function closeUnpayOrders($order)
     {
         $order['order_status'] = OS_CANCELED;
-        $order['to_buyer']     = RC_Lang::get('groupbuy::groupbuy.cancel_order_reason');
+        $order['to_buyer']     = '团购失败';
         $order['pay_status']   = PS_UNPAYED;
         $order['pay_time']     = 0;
         $money                 = $order['surplus'] + $order['money_paid'];
@@ -279,7 +287,7 @@ class GroupbuyActivitySucceed
     {
         RC_DB::table('goods_activity')
             ->where('store_id', '>', 0)
-            ->wher('act_id', $act_id)
+            ->where('act_id', $act_id)
             ->update(array('is_finished' => GBS_SUCCEED_COMPLETE));
     }
 
