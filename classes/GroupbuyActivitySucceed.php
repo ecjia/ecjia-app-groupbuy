@@ -82,12 +82,10 @@ class GroupbuyActivitySucceed
     {
         //先获取一个已经结束的团购活动，只能一个一个团购活动处理，不能一次性处理太多，防止失败
         $activity_info = $this->getFirstGroupBuyActivitySucceed();
-
         //未找到有效活动，直接返回不处理
         if (empty($activity_info)) {
             return true;
         }
-
         $orders_list = $this->getGroupBuyOrders($activity_info['act_id']);
 
         if (empty($orders_list)) {
@@ -96,10 +94,12 @@ class GroupbuyActivitySucceed
             return new ecjia_error('groupbuy_orderlist_empty', '团购订单为空');
         }
 
+        $group_buy = $this->group_buy_info($activity_info['act_id']);
+
         //遍历执行订单确认任务
-        collect($orders_list)->map(function ($order) use ($activity_info) {
+        collect($orders_list)->map(function ($order) use ($group_buy) {
             //处理订单成功逻辑
-            $this->processSingleOrder($order, $activity_info);
+            $this->processSingleOrder($order, $group_buy);
         });
 
         return true;
@@ -143,9 +143,14 @@ class GroupbuyActivitySucceed
      */
     protected function processSingleOrder($order, $group_buy)
     {
+        $order_id = $order['order_id'];
 
-        $order_id     = $order['order_id'];
-        $goods_amount = floatval($order['goods_amount']);
+        $order_goods = RC_DB::table('order_goods')
+            ->select('order_id', RC_DB::raw('SUM(goods_number * goods_price) AS goods_amount'))
+            ->where('order_id', $order_id)
+            ->first();
+
+        $order['goods_amount'] = floatval($order_goods['goods_amount']);
 
         /**
          * 重新计算团购订单价格，修改订单信息
@@ -173,36 +178,38 @@ class GroupbuyActivitySucceed
     {
         RC_Loader::load_app_func('admin_order', 'orders');
 
-        $order['goods_amount'] = floatval($order['goods_amount']);
         if ($order['insure_fee'] > 0) {
             $shipping            = ecjia_shipping::getPluginDataById($order['shipping_id']);
             $order['insure_fee'] = ecjia_shipping::insureFee($shipping['shipping_code'], $order['goods_amount'], $shipping['insure']);
         }
+
         // 重算支付费用
-        $order['order_amount'] = $order['goods_amount'] + $order['shipping_fee'] + $order['tax']
-            + $order['insure_fee'] + $order['pack_fee'] + $order['card_fee']
+        $order['order_amount'] = $order['goods_amount']
+//            + $order['shipping_fee'] + $order['tax']
+//            + $order['insure_fee'] + $order['pack_fee'] + $order['card_fee']
             - $order['money_paid'] - $order['surplus'];
-        $order['pay_fee']      = pay_fee($order['pay_id'], $order['order_amount']);
 
-        $order['order_amount'] += $order['pay_fee'];
 //        if ($order['order_amount'] > 0) {
-//            $order['pay_status'] = PS_UNPAYED;
-//            $order['pay_time']   = 0;
+//            $order['pay_fee'] = pay_fee($order['pay_id'], $order['order_amount']);
 //        } else {
-//            $order['pay_status'] = PS_PAYED;
-//            $order['pay_time']   = RC_Time::gmtime();
+//            $order['pay_fee'] = 0;
 //        }
+//        $order['order_amount'] += $order['pay_fee'];
 
-        $order['pay_status'] = PS_UNPAYED;
-        $order['pay_time']   = 0;
+        if ($order['order_amount'] > 0) {
+            $order['pay_status'] = PS_UNPAYED;
+            $order['pay_time']   = 0;
+        } else {
+            $order['pay_status'] = PS_PAYED;
+            $order['pay_time']   = RC_Time::gmtime();
+        }
 
         $order['order_status'] = OS_CONFIRMED;
         $order['confirm_time'] = RC_Time::gmtime();
 
-        $order['to_buyer']     = '团购活动成功结束';
+        $order['to_buyer'] = '团购活动成功结束';
 
         update_order($order['order_id'], $order);
-
     }
 
 
@@ -452,10 +459,10 @@ class GroupbuyActivitySucceed
                     $status = GBS_FINISHED;
                 }
             }
-        } elseif ($group_buy['is_finished'] == GBS_SUCCEED) {
+        } elseif ($group_buy['is_finished'] == GBS_SUCCEED || $group_buy['is_finished'] == GBS_SUCCEED_COMPLETE) {
             /* 已处理，团购成功 */
             $status = GBS_SUCCEED;
-        } elseif ($group_buy['is_finished'] == GBS_FAIL) {
+        } elseif ($group_buy['is_finished'] == GBS_FAIL || $group_buy['is_finished'] == GBS_FAIL_COMPLETE) {
             /* 已处理，团购失败 */
             $status = GBS_FAIL;
         }
