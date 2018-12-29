@@ -47,6 +47,12 @@
 namespace Ecjia\App\Groupbuy;
 
 use RC_DB;
+use RC_Notification;
+use RC_Time;
+use RC_Api;
+use RC_Lang;
+use RC_Model;
+
 
 /**
  * 团购活动成功
@@ -64,13 +70,13 @@ class GroupbuyActivityFailed extends GroupbuyActivitySucceed
 
     }
 
-
     /**
      * 发送短信消息通知
      */
     protected function sendSmsMessageNotice($order)
     {
-        $options  = array(
+        $store_name = $this->getStoreName($order['store_id']);
+        $options    = array(
             'mobile' => $order['mobile'],
             'event'  => 'sms_groupbuy_activity_succeed',
             'value'  => array(
@@ -79,7 +85,7 @@ class GroupbuyActivityFailed extends GroupbuyActivitySucceed
                 'goods_name' => $order['goods_name']
             )
         );
-        $response = RC_Api::api('sms', 'send_event_sms', $options);
+        $response   = RC_Api::api('sms', 'send_event_sms', $options);
     }
 
     /**
@@ -87,9 +93,13 @@ class GroupbuyActivityFailed extends GroupbuyActivitySucceed
      */
     protected function sendDatabaseMessageNotice($order)
     {
+        $store_name = $this->getStoreName($order['store_id']);
+
         //消息通知
         $user_name = RC_DB::table('users')->where('user_id', $order['user_id'])->pluck('user_name');
-        $user_ob   = $orm_user_db->find($order['user_id']);
+
+        $orm_user_db = RC_Model::model('orders/orm_users_model');
+        $user_ob     = $orm_user_db->find($order['user_id']);
 
         $groupbuy_data      = array(
             'title' => '团购活动成功结束',
