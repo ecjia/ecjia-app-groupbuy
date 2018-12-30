@@ -55,6 +55,7 @@ use RC_Api;
 use RC_Lang;
 use RC_Model;
 use ecjia_error;
+use ecjia_shipping;
 use RC_Loader;
 
 /**
@@ -94,7 +95,7 @@ class GroupbuyActivitySucceed
             return new ecjia_error('groupbuy_orderlist_empty', '团购订单为空');
         }
 
-        $group_buy = $this->group_buy_info($activity_info['act_id']);
+        $group_buy = $this->groupBuyInfo($activity_info['act_id']);
 
         //遍历执行订单确认任务
         collect($orders_list)->map(function ($order) use ($group_buy) {
@@ -307,7 +308,7 @@ class GroupbuyActivitySucceed
      *            本次购买数量（计算当前价时要加上的数量）
      * @return array status 状态：
      */
-    protected function group_buy_info($group_buy_id, $current_num = 0)
+    protected function groupBuyInfo($group_buy_id, $current_num = 0)
     {
         /* 取得团购活动信息 */
         $group_buy_id = intval($group_buy_id);
@@ -346,7 +347,7 @@ class GroupbuyActivitySucceed
         $group_buy['price_ladder'] = $price_ladder;
 
         /* 统计信息 */
-        $stat      = self::group_buy_stat($group_buy_id, $group_buy['deposit']);
+        $stat      = $this->groupBuyStats($group_buy_id, $group_buy['deposit']);
         $group_buy = array_merge($group_buy, $stat);
 
         /* 计算当前价 */
@@ -368,7 +369,7 @@ class GroupbuyActivitySucceed
         $group_buy['trans_amount']         = $group_buy['valid_goods'];
 
         /* 状态 */
-        $group_buy['status'] = self::group_buy_status($group_buy);
+        $group_buy['status'] = $this->groupBuyStatus($group_buy);
 
         if (RC_Lang::get('goods::goods.gbs.' . $group_buy['status'])) {
             $group_buy['status_desc'] = RC_Lang::get('goods::goods.gbs.' . $group_buy['status']);
@@ -389,7 +390,7 @@ class GroupbuyActivitySucceed
      *  valid_order有效订单数
      *  valid_goods 有效商品数
      */
-    protected function group_buy_stat($group_buy_id, $deposit)
+    protected function groupBuyStats($group_buy_id, $deposit)
     {
         $group_buy_id = intval($group_buy_id);
 
@@ -443,7 +444,7 @@ class GroupbuyActivitySucceed
      *            array
      * @return integer
      */
-    protected function group_buy_status($group_buy)
+    protected function groupBuyStatus($group_buy)
     {
         $now = RC_Time::gmtime();
         if ($group_buy['is_finished'] == 0) {
