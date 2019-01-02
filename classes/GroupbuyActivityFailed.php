@@ -56,6 +56,7 @@ use RC_Lang;
 use RC_Model;
 use ecjia_error;
 use RC_Loader;
+use Ecjia\App\Refund\ReturnAutoApply;
 
 
 /**
@@ -64,14 +65,84 @@ use RC_Loader;
 class GroupbuyActivityFailed extends GroupbuyActivitySucceed
 {
 
+    protected function cronJob()
+    {
+        //先获取一个已经结束的团购活动，只能一个一个团购活动处理，不能一次性处理太多，防止失败
+        $activity_info = $this->getFirstGroupBuyActivityFailed();
+
+        //未找到有效活动，直接返回不处理
+        if (empty($activity_info)) {
+            return true;
+        }
+        $orders_list = $this->getGroupBuyOrders($activity_info['act_id']);
+
+        if (empty($orders_list)) {
+            $this->processGroupBuyAcitivityComplete($activity_info['act_id']);
+
+            return new ecjia_error('groupbuy_orderlist_empty', '团购订单为空');
+        }
+
+        $group_buy = $this->groupBuyInfo($activity_info['act_id']);
+
+        //遍历执行订单确认任务
+        collect($orders_list)->map(function ($order) use ($group_buy) {
+            //处理订单成功逻辑
+            $this->processSingleOrder($order, $group_buy);
+        });
+
+        return true;
+
+    }
+
+    /**
+     * 获取第一个团购活动
+     * @return int
+     */
+    protected function getFirstGroupBuyActivityFailed()
+    {
+        $activity_info = RC_DB::table('goods_activity')->where('store_id', '>', 0)->where('is_finished', GBS_FAIL)->first();
+        if (!empty($activity_info)) {
+            return $activity_info;
+        } else {
+            return 0;
+        }
+    }
+
+
     /**
      * 处理付款订单
      * @param $order
      */
     protected function processPayedOrders($order)
     {
-        //发起退款请求，生成退款订单，打款记录
+        // 修改订单状态为已取消，付款状态为未付款
+        $order['order_status'] = OS_CANCELED;
+        $order['to_buyer']     = RC_Lang::get('groupbuy::groupbuy.cancel_order_reason');
+        $order['pay_status']   = PS_UNPAYED;
+        $order['pay_time']     = 0;
 
+        /* 如果使用余额或有已付款金额，退回帐户余额 */
+        $money = $order['surplus'] + $order['money_paid'];
+
+        if ($money > 0) {
+            $order['surplus']      = 0;
+            $order['money_paid']   = 0;
+            $order['order_amount'] = $money;
+
+            //发起退款请求，生成退款订单，打款记录
+
+            $action = array(
+                'user_type' => 'admin',
+                'user_id'   => 0,
+                'user_name' => '系统操作'
+            );
+            $auto_apply = new ReturnAutoApply($order['order_id'], $action);
+
+            $auto_apply->autoApplyRefundOrder();
+        }
+
+        /* 更新订单 */
+        update_order($order['order_id'], $order);
     }
 
     /**
@@ -124,7 +195,7 @@ class GroupbuyActivityFailed extends GroupbuyActivitySucceed
     {
         RC_DB::table('goods_activity')
             ->where('store_id', '>', 0)
-            ->wher('act_id', $act_id)
+            ->where('act_id', $act_id)
             ->update(array('is_finished' => GBS_FAIL_COMPLETE));
     }
 
