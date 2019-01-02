@@ -208,8 +208,8 @@ class GroupbuyActivitySucceed
             $order['pay_time']   = RC_Time::gmtime();
         }
 
-        $order['order_status'] = OS_CONFIRMED;
-        $order['confirm_time'] = RC_Time::gmtime();
+//        $order['order_status'] = OS_CONFIRMED;
+//        $order['confirm_time'] = RC_Time::gmtime();
 
         $order['to_buyer'] = '团购活动成功结束';
 

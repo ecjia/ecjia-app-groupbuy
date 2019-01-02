@@ -59,7 +59,7 @@ use RC_Loader;
 
 
 /**
- * 团购活动成功
+ * 团购活动失败
  */
 class GroupbuyActivityFailed extends GroupbuyActivitySucceed
 {
