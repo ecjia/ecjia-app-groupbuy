@@ -106,8 +106,8 @@ class GroupbuyActivityFailed extends GroupbuyActivitySucceed
         $user_ob     = $orm_user_db->find($order['user_id']);
 
         $groupbuy_data      = array(
-            'title' => '团购活动成功结束',
-            'body'  => '您在' . $store_name . '店铺参加的商品' . $order['goods_name'] . '的团购活动现已结束， 请尽快支付订单剩余余款，方便及时给您发货。',
+            'title' => '团购活动失败',
+            'body'  => '您在' . $store_name . '店铺参加的商品' . $order['goods_name'] . '的团购活动失败， 我们会尽快为你退款。',
             'data'  => array(
                 'user_id'    => $order['user_id'],
                 'user_name'  => $user_name,

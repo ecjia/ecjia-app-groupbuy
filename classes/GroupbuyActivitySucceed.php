@@ -146,6 +146,8 @@ class GroupbuyActivitySucceed
     {
         $order_id = $order['order_id'];
 
+        RC_DB::table('order_goods')->where('order_id', $order_id)->update(array('goods_price' => $group_buy['trans_price']));
+
         $order_goods = RC_DB::table('order_goods')
             ->select('order_id', RC_DB::raw('SUM(goods_number * goods_price) AS goods_amount'))
             ->where('order_id', $order_id)
@@ -160,13 +162,14 @@ class GroupbuyActivitySucceed
         if ($order['surplus'] + $order['money_paid'] >= $group_buy['deposit']) {
             //处理付款订单
             $this->processPayedOrders($order);
+
+            $this->sendSmsMessageNotice($order);
+
+            $this->sendDatabaseMessageNotice($order);
+
         } else {
             $this->closeUnpayOrders($order);
         }
-
-        $this->sendSmsMessageNotice($order);
-
-        $this->sendDatabaseMessageNotice($order);
 
         return true;
     }
@@ -186,16 +189,16 @@ class GroupbuyActivitySucceed
 
         // 重算支付费用
         $order['order_amount'] = $order['goods_amount']
-//            + $order['shipping_fee'] + $order['tax']
-//            + $order['insure_fee'] + $order['pack_fee'] + $order['card_fee']
+            + $order['shipping_fee'] + $order['tax']
+            + $order['insure_fee'] + $order['pack_fee'] + $order['card_fee']
             - $order['money_paid'] - $order['surplus'];
 
-//        if ($order['order_amount'] > 0) {
-//            $order['pay_fee'] = pay_fee($order['pay_id'], $order['order_amount']);
-//        } else {
-//            $order['pay_fee'] = 0;
-//        }
-//        $order['order_amount'] += $order['pay_fee'];
+        if ($order['order_amount'] > 0) {
+            $order['pay_fee'] = pay_fee($order['pay_id'], $order['order_amount']);
+        } else {
+            $order['pay_fee'] = 0;
+        }
+        $order['order_amount'] += $order['pay_fee'];
 
         if ($order['order_amount'] > 0) {
             $order['pay_status'] = PS_UNPAYED;
@@ -220,6 +223,8 @@ class GroupbuyActivitySucceed
      */
     protected function closeUnpayOrders($order)
     {
+        RC_Loader::load_app_func('admin_order', 'orders');
+
         $order['order_status'] = OS_CANCELED;
         $order['to_buyer']     = '团购失败';
         $order['pay_status']   = PS_UNPAYED;

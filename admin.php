@@ -340,34 +340,6 @@ class admin extends ecjia_admin
     }
 
     /**
-     * 批量操作
-     */
-    public function batch()
-    {
-        $this->admin_priv('groupbuy_delete', ecjia::MSGTYPE_JSON);
-
-        if (!empty($_SESSION['ru_id'])) {
-            return $this->showmessage(__('入驻商家没有操作权限，请登陆商家后台操作！'), ecjia::MSGTYPE_JSON | ecjia::MSGSTAT_ERROR);
-        }
-
-        $group_buy_id = $_POST['act_id'];
-        $group_buy = $this->group_buy_info($group_buy_id);
-
-        if ($group_buy['valid_order'] > 0) {
-            return $this->showmessage('该团购活动已经有订单，不能删除！', ecjia::MSGTYPE_JSON | ecjia::MSGSTAT_ERROR);
-        } else {
-            $arr = explode(',', $group_buy_id);
-            foreach ($arr as $val) {
-                $goods_name = RC_DB::table('goods_activity')->where('act_id', $val)->pluck('goods_name');
-                ecjia_admin::admin_log('团购商品是' . $goods_name, 'batch_remove', 'group_buy');
-            }
-            RC_DB::table('goods_activity')->whereIn('act_id', $group_buy_id)->delete();
-
-            return $this->showmessage('批量删除操作成功', ecjia::MSGTYPE_JSON | ecjia::MSGSTAT_SUCCESS, array('pjaxurl' => RC_Uri::url('groupbuy/admin/init')));
-        }
-    }
-
-    /**
      * 删除团购活动
      */
     public function remove()
