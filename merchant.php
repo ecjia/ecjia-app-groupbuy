@@ -165,6 +165,7 @@ class merchant extends ecjia_merchant
 
         $price_ladder = array();
         $count        = count($_POST['ladder_amount']);
+
         for ($i = $count - 1; $i >= 0; $i--) {
             $amount = intval($_POST['ladder_amount'][$i]);
             if ($amount <= 0) {
@@ -179,6 +180,7 @@ class merchant extends ecjia_merchant
             }
             $price_ladder[$amount] = array('amount' => $amount, 'price' => $price);
         }
+
         if (count($price_ladder) < 1) {
             return $this->showmessage('请输入有效的价格阶梯！', ecjia::MSGTYPE_JSON | ecjia::MSGSTAT_ERROR);
         }

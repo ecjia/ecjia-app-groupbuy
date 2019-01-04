@@ -115,6 +115,8 @@ class GroupbuyActivityFailed extends GroupbuyActivitySucceed
      */
     protected function processPayedOrders($order)
     {
+        RC_Loader::load_app_func('admin_order', 'orders');
+
         // 修改订单状态为已取消，付款状态为未付款
         $order['order_status'] = OS_CANCELED;
         $order['to_buyer']     = RC_Lang::get('groupbuy::groupbuy.cancel_order_reason');
@@ -153,7 +155,7 @@ class GroupbuyActivityFailed extends GroupbuyActivitySucceed
         $store_name = $this->getStoreName($order['store_id']);
         $options    = array(
             'mobile' => $order['mobile'],
-            'event'  => 'sms_groupbuy_activity_succeed',
+            'event'  => 'sms_groupbuy_activity_failed',
             'value'  => array(
                 'user_name'  => $order['consignee'],
                 'store_name' => $store_name,
