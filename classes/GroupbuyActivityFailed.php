@@ -133,7 +133,7 @@ class GroupbuyActivityFailed extends GroupbuyActivitySucceed
 
             //发起退款请求，生成退款订单，打款记录
 
-            $action = array(
+            $action     = array(
                 'user_type' => 'admin',
                 'user_id'   => 0,
                 'user_name' => '系统操作'
@@ -142,6 +142,15 @@ class GroupbuyActivityFailed extends GroupbuyActivitySucceed
 
             $auto_apply->autoApplyRefundOrder();
         }
+
+        $data = array(
+            'order_status' => '团购活动失败',
+            'order_id'     => $order['order_id'],
+            'message'      => '团购活动失败， 我们会尽快为你退款',
+            'add_time'     => RC_Time::gmtime()
+        );
+
+        RC_DB::table('order_status_log')->insert($data);
 
         /* 更新订单 */
         update_order($order['order_id'], $order);

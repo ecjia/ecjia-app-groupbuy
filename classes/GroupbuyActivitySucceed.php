@@ -213,6 +213,15 @@ class GroupbuyActivitySucceed
 
         $order['to_buyer'] = '团购活动成功结束';
 
+        $data = array(
+            'order_status' => '团购活动成功结束',
+            'order_id'     => $order['order_id'],
+            'message'      => '团购活动成功结束，请尽快支付订单剩余余款',
+            'add_time'     => RC_Time::gmtime()
+        );
+
+        RC_DB::table('order_status_log')->insert($data);
+
         update_order($order['order_id'], $order);
     }
 
@@ -226,7 +235,7 @@ class GroupbuyActivitySucceed
         RC_Loader::load_app_func('admin_order', 'orders');
 
         $order['order_status'] = OS_CANCELED;
-        $order['to_buyer']     = '团购失败';
+        $order['to_buyer']     = '团购活动成功未支付';
         $order['pay_status']   = PS_UNPAYED;
         $order['pay_time']     = 0;
         $money                 = $order['surplus'] + $order['money_paid'];
@@ -236,6 +245,16 @@ class GroupbuyActivitySucceed
             $order['order_amount'] = $money;
             order_refund($order, 1, RC_Lang::get('groupbuy::groupbuy.cancel_order_reason') . ':' . $order['order_sn']);
         }
+
+        $data = array(
+            'order_status' => '团购活动成功未支付',
+            'order_id'     => $order['order_id'],
+            'message'      => '团购活动已成功结束，您已超时未支付，订单自动取消',
+            'add_time'     => RC_Time::gmtime()
+        );
+
+        RC_DB::table('order_status_log')->insert($data);
+
         /* 更新订单 */
         update_order($order['order_id'], $order);
     }
