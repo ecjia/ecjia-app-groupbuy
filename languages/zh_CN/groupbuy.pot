@@ -4,7 +4,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: Ecjia App groupbuy 1.27.4\n"
 "Report-Msgid-Bugs-To: https://make.ecjia.com/polyglots/\n"
-"POT-Creation-Date: 2019-02-21 03:55:22+00:00\n"
+"POT-Creation-Date: 2019-03-01 01:44:15+00:00\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
@@ -256,6 +256,10 @@ msgstr ""
 #: apis/groupbuy_admin_purview_api.class.php:13
 #: apis/groupbuy_merchant_purview_api.class.php:15
 msgid "团购删除"
+msgstr ""
+
+#: apis/groupbuy_groupbuy_goods_list_api.class.php:17
+msgid "调用api文件,groupbuy_goods_list,参数无效"
 msgstr ""
 
 #: apis/groupbuy_merchant_purview_api.class.php:13
@@ -610,6 +614,11 @@ msgstr ""
 msgid "没有找到任何记录"
 msgstr ""
 
+#: content/apps/groupbuy/templates/admin/group_buy_list.dwt.php:34
+#: content/apps/groupbuy/templates/merchant/group_buy_list.dwt.php:43
+msgid "请输入团购商品名称"
+msgstr ""
+
 #: content/apps/groupbuy/templates/admin/group_buy_list.dwt.php:47
 #: content/apps/groupbuy/templates/merchant/group_buy_list.dwt.php:59
 msgid "商品名称"
@@ -762,10 +771,6 @@ msgstr ""
 
 #: content/apps/groupbuy/templates/merchant/group_buy_list.dwt.php:38
 msgid "删除团购"
-msgstr ""
-
-#: content/apps/groupbuy/templates/merchant/group_buy_list.dwt.php:43
-msgid "请输入团购商品名称"
 msgstr ""
 
 #: content/apps/groupbuy/templates/merchant/group_buy_list.dwt.php:81
