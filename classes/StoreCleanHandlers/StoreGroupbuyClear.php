@@ -21,7 +21,7 @@ class StoreGroupbuyClear extends StoreCleanAbstract
      * 代号标识
      * @var string
      */
-    protected $code = 'store_favourable_clear';
+    protected $code = 'store_groupbuy_clear';
 
     /**
      * 名称
