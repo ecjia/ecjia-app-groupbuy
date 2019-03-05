@@ -33,7 +33,7 @@ class StoreGroupbuyClear extends StoreCleanAbstract
      * 排序
      * @var int
      */
-    protected $sort = 86;
+    protected $sort = 16;
 
     /**
      * 数据描述及输出显示内容
