@@ -4,7 +4,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: Ecjia App groupbuy 1.28.0\n"
 "Report-Msgid-Bugs-To: https://make.ecjia.com/polyglots/\n"
-"POT-Creation-Date: 2019-03-20 07:33:51+00:00\n"
+"POT-Creation-Date: 2019-04-04 05:54:37+00:00\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
@@ -12,244 +12,244 @@ msgstr ""
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <ecjia@ecjia.com>\n"
 
-#: admin.php:83 admin.php:97 apis/groupbuy_admin_purview_api.class.php:12
+#: admin.php:84 admin.php:98 apis/groupbuy_admin_purview_api.class.php:12
 #: apis/groupbuy_merchant_purview_api.class.php:12
 #: classes/hooks/admin_groupbuy.class.php:52
 msgid "团购管理"
 msgstr ""
 
-#: admin.php:93 admin.php:128 admin.php:255 admin.php:257 admin.php:296
-#: admin.php:298 admin.php:323 merchant.php:90 merchant.php:93 merchant.php:114
+#: admin.php:94 admin.php:129 admin.php:256 admin.php:258 admin.php:297
+#: admin.php:299 admin.php:324 merchant.php:90 merchant.php:93 merchant.php:114
 #: merchant.php:238 merchant.php:240
 msgid "团购活动列表"
 msgstr ""
 
-#: admin.php:94 admin.php:130 merchant.php:91 merchant.php:116
+#: admin.php:95 admin.php:131 merchant.php:91 merchant.php:116
 msgid "添加团购活动"
 msgstr ""
 
-#: admin.php:100 admin.php:133 admin.php:263
+#: admin.php:101 admin.php:134 admin.php:264
 msgid "概述"
 msgstr ""
 
-#: admin.php:102
+#: admin.php:103
 msgid ""
 "欢迎访问ECJia智能后台团购活动列表页面，系统中所有的团购活动都会显示在此列表"
 "中。"
 msgstr ""
 
-#: admin.php:106 admin.php:139 admin.php:269
+#: admin.php:107 admin.php:140 admin.php:270
 msgid "更多信息:"
 msgstr ""
 
-#: admin.php:107
+#: admin.php:108
 msgid ""
 "<a href=\"https://ecjia.com/wiki/帮助:ECJia智能后台:团购活动\" target="
 "\"_blank\">关于团购活动帮助文档</a>"
 msgstr ""
 
-#: admin.php:126 merchant.php:112
+#: admin.php:127 merchant.php:112
 msgid "添加团购商品"
 msgstr ""
 
-#: admin.php:127 merchant.php:113
+#: admin.php:128 merchant.php:113
 msgid "设置团购信息"
 msgstr ""
 
-#: admin.php:135
+#: admin.php:136
 msgid "欢迎访问ECJia智能后台添加团购活动页面，可以在此页面添加团购活动信息。"
 msgstr ""
 
-#: admin.php:140
+#: admin.php:141
 msgid ""
 "<a href=\"https://ecjia.com/wiki/帮助:ECJia智能后台:团购活动#.E6.B7.BB.E5.8A."
 "A0.E5.9B.A2.E8.B4.AD.E6.B4.BB.E5.8A.A8\" target=\"_blank\">关于添加团购活动帮"
 "助文档</a>"
 msgstr ""
 
-#: admin.php:169 merchant.php:144 merchant.php:337
+#: admin.php:170 merchant.php:144 merchant.php:337
 msgid "您选择的商品目前有一个团购活动正在进行,请选择其他商品！"
 msgstr ""
 
-#: admin.php:178 merchant.php:153 merchant.php:343
+#: admin.php:179 merchant.php:153 merchant.php:343
 msgid "商品有属性价格时，不可添加为团购商品！"
 msgstr ""
 
-#: admin.php:196 merchant.php:176 merchant.php:365
+#: admin.php:197 merchant.php:176 merchant.php:365
 msgid "阶梯价格不能小于保证金金额！"
 msgstr ""
 
-#: admin.php:204 merchant.php:185 merchant.php:374
+#: admin.php:205 merchant.php:185 merchant.php:374
 msgid "请输入有效的价格阶梯！"
 msgstr ""
 
-#: admin.php:209 merchant.php:190 merchant.php:379 merchant.php:429
+#: admin.php:210 merchant.php:190 merchant.php:379 merchant.php:429
 msgid "限购数量不能小于价格阶梯中的最大数量！"
 msgstr ""
 
-#: admin.php:218 merchant.php:199 merchant.php:385 merchant.php:408
+#: admin.php:219 merchant.php:199 merchant.php:385 merchant.php:408
 msgid "请输入一个有效的团购时间！"
 msgstr ""
 
-#: admin.php:239 merchant.php:221 merchant.php:308
+#: admin.php:240 merchant.php:221 merchant.php:308
 msgid "返回团购活动列表"
 msgstr ""
 
-#: admin.php:240 merchant.php:222
+#: admin.php:241 merchant.php:222
 msgid "继续添加团购活动"
 msgstr ""
 
-#: admin.php:242 merchant.php:224
+#: admin.php:243 merchant.php:224
 msgid "添加团购活动成功！"
 msgstr ""
 
-#: admin.php:252
+#: admin.php:253
 msgid "更新团购商品"
 msgstr ""
 
-#: admin.php:253
+#: admin.php:254
 msgid "更新团购信息"
 msgstr ""
 
-#: admin.php:260 merchant.php:243
+#: admin.php:261 merchant.php:243
 msgid "更新团购活动"
 msgstr ""
 
-#: admin.php:265
+#: admin.php:266
 msgid ""
 "欢迎访问ECJia智能后台编辑团购活动页面，可以在此页面编辑相应的团购活动信息。"
 msgstr ""
 
-#: admin.php:270
+#: admin.php:271
 msgid ""
 "<a href=\"https://ecjia.com/wiki/帮助:ECJia智能后台:团购活动#.E7.BC.96.E8."
 "BE.91.E5.9B.A2.E8.B4.AD.E6.B4.BB.E5.8A.A8\" target=\"_blank\">关于编辑团购活"
 "动帮助文档</a>"
 msgstr ""
 
-#: admin.php:294
+#: admin.php:295
 msgid "团购活动详情"
 msgstr ""
 
-#: admin.php:301
+#: admin.php:302
 msgid "活动详情"
 msgstr ""
 
-#: admin.php:322 admin.php:324
+#: admin.php:323 admin.php:325
 msgid "团购订单列表"
 msgstr ""
 
-#: admin.php:328
+#: admin.php:329
 msgid "该团购活动不存在"
 msgstr ""
 
-#: admin.php:337
+#: admin.php:338
 msgid "未接单"
 msgstr ""
 
-#: admin.php:338
+#: admin.php:339
 msgid "已接单"
 msgstr ""
 
-#: admin.php:339 configs/jslang.php:68
+#: admin.php:340 configs/jslang.php:68
 #: modules/groupbuy/order/detail_module.class.php:330
 msgid "取消"
 msgstr ""
 
-#: admin.php:340
+#: admin.php:341
 msgid "无效"
 msgstr ""
 
-#: admin.php:341
+#: admin.php:342
 msgid "退货"
 msgstr ""
 
-#: admin.php:342
+#: admin.php:343
 msgid "已分单"
 msgstr ""
 
-#: admin.php:343
+#: admin.php:344
 msgid "部分分单"
 msgstr ""
 
-#: admin.php:348
+#: admin.php:349
 msgid "未付款"
 msgstr ""
 
-#: admin.php:349
+#: admin.php:350
 msgid "付款中"
 msgstr ""
 
-#: admin.php:350 modules/groupbuy/order/detail_module.class.php:325
+#: admin.php:351 modules/groupbuy/order/detail_module.class.php:325
 msgid "已付款"
 msgstr ""
 
-#: admin.php:355
+#: admin.php:356
 msgid "未发货"
 msgstr ""
 
-#: admin.php:356 modules/groupbuy/order/detail_module.class.php:327
+#: admin.php:357 modules/groupbuy/order/detail_module.class.php:327
 msgid "配货中"
 msgstr ""
 
-#: admin.php:357 modules/groupbuy/order/detail_module.class.php:328
+#: admin.php:358 modules/groupbuy/order/detail_module.class.php:328
 msgid "已发货"
 msgstr ""
 
-#: admin.php:358
+#: admin.php:359
 msgid "收货确认"
 msgstr ""
 
-#: admin.php:359
+#: admin.php:360
 msgid "已发货(部分商品)"
 msgstr ""
 
-#: admin.php:360
+#: admin.php:361
 msgid "发货中"
 msgstr ""
 
-#: admin.php:378 merchant.php:499
+#: admin.php:379 merchant.php:499
 msgid "该团购活动已经有订单，不能删除！"
 msgstr ""
 
-#: admin.php:383 merchant.php:504
+#: admin.php:384 merchant.php:504
 msgid "删除成功！"
 msgstr ""
 
-#: admin.php:503 admin.php:697 classes/GroupbuyActivitySucceed.php:399
+#: admin.php:508 admin.php:702 classes/GroupbuyActivitySucceed.php:399
 #: classes/GroupbuyStatus.php:85 classes/groupbuy_activity.class.php:147
-#: merchant.php:635 merchant.php:830
+#: merchant.php:639 merchant.php:834
 msgid "未开始"
 msgstr ""
 
-#: admin.php:504 admin.php:698 classes/GroupbuyActivitySucceed.php:400
+#: admin.php:509 admin.php:703 classes/GroupbuyActivitySucceed.php:400
 #: classes/GroupbuyStatus.php:86 classes/groupbuy_activity.class.php:148
-#: merchant.php:636 merchant.php:831
+#: merchant.php:640 merchant.php:835
 #: modules/groupbuy/order/detail_module.class.php:408
 msgid "进行中"
 msgstr ""
 
-#: admin.php:505 admin.php:699 classes/GroupbuyActivitySucceed.php:401
+#: admin.php:510 admin.php:704 classes/GroupbuyActivitySucceed.php:401
 #: classes/GroupbuyStatus.php:87 classes/groupbuy_activity.class.php:149
-#: merchant.php:637 merchant.php:832
+#: merchant.php:641 merchant.php:836
 msgid "结束未处理"
 msgstr ""
 
-#: admin.php:506 admin.php:508 admin.php:700 admin.php:702
+#: admin.php:511 admin.php:513 admin.php:705 admin.php:707
 #: classes/GroupbuyActivitySucceed.php:402
 #: classes/GroupbuyActivitySucceed.php:404 classes/GroupbuyStatus.php:88
 #: classes/groupbuy_activity.class.php:150
-#: classes/groupbuy_activity.class.php:152 merchant.php:638 merchant.php:640
-#: merchant.php:833 merchant.php:835
+#: classes/groupbuy_activity.class.php:152 merchant.php:642 merchant.php:644
+#: merchant.php:837 merchant.php:839
 msgid "成功结束"
 msgstr ""
 
-#: admin.php:507 admin.php:509 admin.php:701 admin.php:703
+#: admin.php:512 admin.php:514 admin.php:706 admin.php:708
 #: classes/GroupbuyActivitySucceed.php:403
 #: classes/GroupbuyActivitySucceed.php:405 classes/GroupbuyStatus.php:89
 #: classes/groupbuy_activity.class.php:151
-#: classes/groupbuy_activity.class.php:153 merchant.php:639 merchant.php:641
-#: merchant.php:834 merchant.php:836
+#: classes/groupbuy_activity.class.php:153 merchant.php:643 merchant.php:645
+#: merchant.php:838 merchant.php:840
 msgid "失败结束"
 msgstr ""
 
